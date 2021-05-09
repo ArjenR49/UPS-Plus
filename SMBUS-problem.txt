@@ -1,0 +1,59 @@
+pi@RPI-HUB:~ $ $HOME/UPS+/UPS_report
+Raspberry Pi supply voltage:                         4.920 V
+Raspberry Pi current consumption:                    2.090 A
+Raspberry Pi power consumption:                     10.600 W
+
+Battery voltage (from INA219):                       4.220 V
+Battery current (charging):                          0.160 A
+Power supplied to the batteries:                     0.790 W
+
+Traceback (most recent call last):
+  File "/home/pi/UPS+/UPS_report.py", line 119, in <module>
+    aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
+  File "/home/pi/.local/lib/python3.7/site-packages/smbus2/smbus2.py", line 433, in read_byte_data
+    ioctl(self.fd, I2C_SMBUS, msg)
+TimeoutError: [Errno 110] Connection timed out
+pi@RPI-HUB:~ $
+
+
+
+i: 10  - byte: 0B
+i: 11  - byte: F0
+i: 12  - byte: 0A
+i: 13  - byte: 63
+i: 14  - byte: 00
+i: 15  - byte: 02
+i: 16  - byte: 00
+i: 17  - byte: 01
+i: 18  - byte: 00
+i: 19  - byte: 00
+i: 1A  - byte: 00
+i: 1B  - byte: 00
+i: 1C  - byte: 33
+i: 1D  - byte: A4
+i: 1E  - byte: 06
+i: 1F  - byte: 00
+i: 20  - byte: E7
+j= 62
+
+i: 01  - byte: CD
+i: 02  - byte: 0C
+i: 03  - byte: 34
+i: 04  - byte: 13
+i: 05  - byte: 49
+i: 06  - byte: 10
+i: 07  - byte: CC
+i: 08  - byte: 23
+i: 09  - byte: 00
+i: 0A  - byte: 00
+i: 0B  - byte: 2C
+i: 0C  - byte: 00
+i: 0D  - byte: DB
+i: 0E  - byte: 10
+i: 0F  - byte: F0
+TimeoutError 16
+Traceback (most recent call last):
+  File "/home/pi/UPS+/UPS_reportX.py", line 51, in <module>
+    print("i: %02X" % i, " - byte: %02X" % bReceiveBuf[i])
+IndexError: list index out of range
+pi@RPI-HUB:~ $

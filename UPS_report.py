@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 07-05-2021
+# ar - 09-05-2021
 
 import os
 import time
@@ -122,7 +122,7 @@ print()
 if aReceiveBuf[0x17] == 1:
     print("Current power state: normal")
 else:
-    print("Current power state: off")
+    print("Current power state: other")
 
 print()
 if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
@@ -148,9 +148,9 @@ else:
         print("*** grace time till shutdown will be left: %d min" % GRACE_TIME)
     print()
 
-print(("{:<60s}").format("Usually registers 0x18, 0x19 and 0x1A are only set"))
-print(("{:<60s}").format("by the upsPlus.py control script in case of power loss"))
-print(("{:<60s}").format("and a pending shut down of the Pi."))
+print(("{:<60s}").format("During normal operation registers 0x18, 0x19 and 0x1A"))
+print(("{:<60s}").format("are only set by the upsPlus.py control script in case"))
+print(("{:<60s}").format("of power loss and a pending shut down of the Pi."))
 
 if aReceiveBuf[0x18] == 0:
     print('0x18: UPS power down timer not set.')

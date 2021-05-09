@@ -36,7 +36,7 @@ bus = smbus2.SMBus(DEVICE_BUS)
 
 # Essential UPS I2C register default values (name format Operation Mode Register Address)
 # for shut down & power off state
-OMR0x18=30 # seconds, power off delay
+OMR0x18=60 # seconds, power off delay
 OMR0x19=1  # boolean, automatic restart or not
 OMR0x1A=0  # seconds, power up delay
 

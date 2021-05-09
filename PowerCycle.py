@@ -20,7 +20,7 @@ DEVICE_ADDR = 0x17
 # for shut down & power off state
 OMR0x18=0   # seconds, power off delay
 OMR0x19=0   # boolean, automatic restart or not
-OMR0x1A=30  # seconds, power up delay
+OMR0x1A=60  # seconds, power up delay
 
 # Raspberry Pi Communicates with MCU via I2C protocol.
 bus = smbus2.SMBus(DEVICE_BUS)

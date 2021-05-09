@@ -61,7 +61,7 @@ f.close()
 # Keep Pi running for maximum <GRACE_TIME> 'units' of time after blackout
 # (unit = upsPlus.py cron job interval, normally 1 min)
 GRACE_TIME = 1440
-GRACE_TIME = 3
+GRACE_TIME = 10
 # Minimum practical value is 3 ...
 GRACE_TIME = max(GRACE_TIME, 3)
 

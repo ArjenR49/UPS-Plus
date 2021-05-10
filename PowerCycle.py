@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 08-05-2021
+# ar - 10-05-2021
 
 # ''' Halt the Pi, power down, then power up Pi (= perform power cycle) '''
 
@@ -20,7 +20,7 @@ DEVICE_ADDR = 0x17
 # for shut down & power off state
 OMR0x18=0   # seconds, power off delay
 OMR0x19=0   # boolean, automatic restart or not
-OMR0x1A=60  # seconds, power up delay
+OMR0x1A=120  # seconds, power up delay
 
 # Raspberry Pi Communicates with MCU via I2C protocol.
 bus = smbus2.SMBus(DEVICE_BUS)
@@ -59,7 +59,7 @@ while True:
         continue
 
 # Make Pi perform sync and then halt.
-os.system("sudo sync && sudo halt &")
+os.system("sudo shutdown now")
 
 # Script continues executing, indefinitely as it were (& keeping the lock)
 # until it is eventually killed by the Pi shutting down.

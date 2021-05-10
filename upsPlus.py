@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 09-05-2021
+# ar - 10-05-2021
 
 # ''' UPS Plus v.5 control script '''
 
@@ -36,7 +36,7 @@ bus = smbus2.SMBus(DEVICE_BUS)
 
 # Essential UPS I2C register default values (name format Operation Mode Register Address)
 # for shut down & power off state
-OMR0x18=60 # seconds, power off delay
+OMR0x18=120 # seconds, power off delay
 OMR0x19=1  # boolean, automatic restart or not
 OMR0x1A=0  # seconds, power up delay
 
@@ -61,7 +61,7 @@ f.close()
 # Keep Pi running for maximum <GRACE_TIME> 'units' of time after blackout
 # (unit = upsPlus.py cron job interval, normally 1 min)
 GRACE_TIME = 1440
-GRACE_TIME = 10
+GRACE_TIME = 5
 # Minimum practical value is 3 ...
 GRACE_TIME = max(GRACE_TIME, 3)
 
@@ -260,7 +260,7 @@ else:
 
         # UPS will cut power to the Pi after the UPS' power down timer period has expired
         # allowing the Pi to perform sync and then halt.
-        os.system("sudo sync && sudo halt &")
+        os.system("sudo shutdown now")
         # Script continues executing, indefinitely as it were (& keeping the lock on it)
         # until it is eventually killed by the Pi shutting down.
         while True:

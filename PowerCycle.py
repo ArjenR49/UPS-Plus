@@ -19,7 +19,7 @@ DEVICE_ADDR = 0x17
 # Essential UPS I2C register default values (name format: Operation Mode Register Address)
 # for shut down & power off state
 OMR0x18=0   # seconds, power off delay
-OMR0x19=0   # boolean, automatic restart or not
+OMR0x19=0   # boolean, automatic restart (1) or not (0)
 OMR0x1A=120  # seconds, power up delay
 
 # Raspberry Pi Communicates with MCU via I2C protocol.

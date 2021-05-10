@@ -24,7 +24,6 @@
 SHELL=/bin/bash
 
 # m h  dom mon dow   command
-## 0 1 * * 1 sudo shutdown --reboot # boot once a week on Monday
 
 # Run the regular UPS control script upsPlus.py every minute.
 # Establish a lock to prevent PowerCycle.py to cut the UPS control script short.
@@ -33,7 +32,7 @@ SHELL=/bin/bash
 # Running PowerCycle.py every 15 minutes as a stress test ...
 #
 # Do not run PowerCycle.py at the same time as backintime is scheduled to run!
-# Make PowerCycle wait for upsPlus.py to finish and release the lock file.
+# Make PowerCycle.py wait for upsPlus.py to finish and release the lock file.
 */15 * * * * [ "$(date '+\%H:\%M')" != "04:00" ] && flock -w 15 $HOME/UPS+/UPS_job.lock python3 $HOME/UPS+/PowerCycle.py
 
 #Back In Time system entry, this will be edited by the gui:

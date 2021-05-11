@@ -65,15 +65,9 @@ def round_sig(x, n=3):
     factor = (10 ** power)
     return round(x * factor) / factor
 
-# Write byte to specified I2C register address
 def putByte(RA, byte):
-    while True:
-        try:
-            bus.write_byte_data(DEVICE_ADDR, RA, byte)
-            time.sleep(0.1)
-            break
-        except TimeoutError:
-            continue
+    with SMBus(DEVICE_BUS) as bus2:
+        bus2.write_byte_data(DEVICE_ADDR, RA, byte)
 
 # Save POWEROFF_LIMIT to text file for sharing with other scripts
 f = open(PATH+'UPS_parameters.txt', 'w')
@@ -82,15 +76,24 @@ f.write("\n")
 f.close()
 
 # Store battery voltage discharge protection limit in UPS memory
-while True:
-    try:
+# while True:
+#     try:
+#         bus.write_byte_data(DEVICE_ADDR, 0x11, DISCHARGE_LIMIT & 0xFF)
+#         bus.write_byte_data(DEVICE_ADDR, 0x12,
+#                             (DISCHARGE_LIMIT >> 0o10) & 0xFF)
+#         break
+#     except TimeoutError:
+#         time.sleep(0.1)
+#         continue
+
+try:
+    with SMBus(DEVICE_BUS) as bus:
         bus.write_byte_data(DEVICE_ADDR, 0x11, DISCHARGE_LIMIT & 0xFF)
         bus.write_byte_data(DEVICE_ADDR, 0x12,
-                            (DISCHARGE_LIMIT >> 0o10) & 0xFF)
-        break
-    except TimeoutError:
-        time.sleep(0.1)
-        continue
+                                (DISCHARGE_LIMIT >> 0o10) & 0xFF)
+except TimeoutError as e:
+    print(e)
+    time.sleep(0.1)
 
 # Create instance of INA219 and extract information
 ina = INA219(0.00725, address=0x40)
@@ -143,17 +146,12 @@ aReceiveBuf.append(0x00)
 i = 0x01
 while i < 0x100:
     try:
-        aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
-        i = i+1
-    except TimeoutError:
+        with SMBus(DEVICE_BUS) as bus:
+            aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
+            i += 1
+    except TimeoutError as e:
+        print(i, ' - ', aReceiveBuf[i], ' - ', e)
         time.sleep(0.1)
-        continue
-
-# while i < 0x100:
-#   with SMBus(DEVICE_BUS) as bus:
-#          aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
-#          i += 1
-# 
 
 print()
 while False:

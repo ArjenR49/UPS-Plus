@@ -8,7 +8,8 @@
 
 import os
 import time
-import smbus2
+# import smbus2
+from smbus2 import SMBus 
 
 # Define I2C bus
 DEVICE_BUS = 1
@@ -17,7 +18,7 @@ DEVICE_BUS = 1
 DEVICE_ADDR = 0x17
 
 # Raspberry Pi Communicates with MCU via I2C protocol.
-bus = smbus2.SMBus(DEVICE_BUS)
+# bus = smbus2.SMBus(DEVICE_BUS)
 
 # Essential UPS I2C register default values
 # (name format: Operation Mode Register Address)
@@ -30,11 +31,11 @@ OMR0x1A = 240  # seconds, power up delay
 def putByte(RA, byte):
     while True:
         try:
-            bus.write_byte_data(DEVICE_ADDR, RA, byte)
-            time.sleep(0.1)
-            break
+            with SMBus(DEVICE_BUS) as bus:
+                bus.write_byte_data(DEVICE_ADDR, RA, byte)
+                break
         except TimeoutError:
-            continue
+            time.sleep(0.1)
 
 print("*"*62)
 print(("*** {:^54s} ***").

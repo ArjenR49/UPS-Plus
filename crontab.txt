@@ -27,13 +27,13 @@ SHELL=/bin/bash
 
 # Run the regular UPS control script upsPlus.py every minute.
 # Establish a lock to prevent PowerCycle.py to cut the UPS control script short.
-* * * * * flock $HOME/UPS+/UPS_job.lock python3 $HOME/UPS+/upsPlus.py >>$HOME/UPS+/UPS_event.log
+* * * * * flock $HOME/UPS+/UPS_job.lock python3 $HOME/UPS+/upsPlus2.py >>$HOME/UPS+/UPS_event.log
 
 # Running PowerCycle.py ever so often as a stress test ...
 #
 # Do not run PowerCycle.py at the same time as backintime is scheduled to run!
 # Make PowerCycle.py wait for upsPlus.py to finish and release the lock file.
-*/20 * * * * [ "$(date '+\%H:\%M')" != "04:00" ] && flock -w 15 $HOME/UPS+/UPS_job.lock python3 $HOME/UPS+/PowerCycle.py
+*/15 * * * * [ "$(date '+\%H:\%M')" != "04:00" ] && flock -w 15 $HOME/UPS+/UPS_job.lock python3 $HOME/UPS+/PowerCycle2.py
 
 #Back In Time system entry, this will be edited by the gui:
 0 4 * * * /usr/bin/nice -n 19 /usr/bin/ionice -c2 -n7 /usr/bin/backintime backup-job >/dev/null

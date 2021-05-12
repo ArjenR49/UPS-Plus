@@ -2,19 +2,14 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 09-05-2021
+# ar - 12-05-2021
 
 import os
 import time
-import sys
-import smbus2
+from smbus2 import SMBus
 from datetime import datetime, timezone
 from math import log10, floor
 from ina219 import INA219,DeviceRangeError
-
-#import logging
-#import locale
-#locale.setlocale(locale.LC_ALL, 'nl_NL')
 
 # Record starting time & format in two styles
 StartTime = datetime.now(timezone.utc).astimezone()
@@ -52,8 +47,6 @@ except DeviceRangeError:
     print('Out of Range Warning: BATTERY VOLTAGE EXCEEDING SAFE LIMITS!')
 print()
 
-bus = smbus2.SMBus(DEVICE_BUS)
-
 # Path for parameter files
 PATH = str(os.getenv('HOME'))+'/UPS+/'
 
@@ -79,12 +72,14 @@ f.close()
 aReceiveBuf = []
 aReceiveBuf.append(0x00)
 
-i=1
-while i<0x100:
+i = 0x01
+while i < 0x100:
     try:
-        aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
-        i=i+1
-    except TimeoutError:
+        with SMBus(DEVICE_BUS) as bus:
+            aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
+            i += 1
+    except TimeoutError as e:
+        print(i, ' - ', aReceiveBuf[i], ' - ', e)
         time.sleep(0.1)
 
 print("UPS board MCU voltage:                            %8.3f V" % round_sig((aReceiveBuf[0x02] << 0o10 | aReceiveBuf[0x01])/1000,n=3))
@@ -140,18 +135,24 @@ elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
 else:
 #   Not charging.
     print("*** EXTERNAL POWER LOST! RUNNING ON BATTERY POWER!")
-    print("*** UPS power timers will be set before shutdown.")
-    print("*** When the UPS control script runs again,")
+    print("*** UPS power timers will be set before shutdown,")
+    print("*** as soon as the UPS control script runs, and")
     if (GRACE_TIME==0):
         print("*** the UPS will make the Pi shut down!")
     else:
         print("*** grace time till shutdown will be left: %d min" % GRACE_TIME)
     print()
 
-print(("{:<60s}").format("During normal operation registers 0x18, 0x19 and 0x1A"))
-print(("{:<60s}").format("are only set by the upsPlus.py control script in case"))
-print(("{:<60s}").format("of power loss and a pending shut down of the Pi."))
+print(("{:<60s}").format("UPS power control registers 0x18, 0x19 and 0x1A"))
+print(("{:<60s}").format("are set by the upsPlus.py control script"))
+print(("{:<60s}").format("just before a imminent shut down of the Pi"))
+print(("{:<60s}").format("caused by a power failure."))
+print()
 
+print(("{:<60s}").format("UPS power control registers:  "
+                         + "0x18=" + str(aReceiveBuf[0x18])
+                         + " / 0x19=" + str(aReceiveBuf[0x19])
+                         + " / 0x1A=" + str(aReceiveBuf[0x1A])))
 if aReceiveBuf[0x18] == 0:
     print('0x18: UPS power down timer not set.')
 else:
@@ -181,4 +182,5 @@ UID2 = "%08X" % (aReceiveBuf[0xFB] << 0o30 | aReceiveBuf[0xFA] << 0o20 | aReceiv
 
 print("Serial Number: " + UID0 + "-" + UID1 + "-" + UID2 )
 print()
+
 #EOF

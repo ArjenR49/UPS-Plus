@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 11-05-2021
+# ar - 12-05-2021
 
 # ''' UPS Plus v.5 control script '''
 
 import os
 import time
-import smbus2
 from smbus2 import SMBus
 from math import log10, floor
 from ina219 import INA219, DeviceRangeError
@@ -17,7 +16,7 @@ from datetime import datetime, timezone
 # Essential UPS I2C register default values
 # (name format: Operation Mode Register Address)
 # for shut down & power off state
-OMR0x18 = 240   # seconds, power off delay
+OMR0x18 = 60   # seconds, power off delay
 OMR0x19 = 1     # boolean, automatic restart or not
 OMR0x1A = 0     # seconds, power up delay
 
@@ -26,9 +25,6 @@ DEVICE_BUS = 1
 
 # Define device I2C slave address.
 DEVICE_ADDR = 0x17
-
-# Raspberry Pi Communicates with MCU via I2C protocol.
-bus = smbus2.SMBus(DEVICE_BUS)
 
 # Set threshold for UPS automatic power-off to prevent
 # destroying the batteries by excessive discharge (unit: mV).
@@ -42,9 +38,9 @@ POWEROFF_LIMIT = 3300
 # Keep Pi running for maximum <GRACE_TIME> 'units' of time after blackout
 # (unit = upsPlus.py cron job interval, normally 1 min)
 GRACE_TIME = 1440
-GRACE_TIME = 5
-# Minimum practical value is 3 ...
-GRACE_TIME = max(GRACE_TIME, 3)
+GRACE_TIME = 2
+# Minimum practical value is 2 ...
+GRACE_TIME = max(GRACE_TIME, 2)
 
 # Set the sample period, unit: min (usually 2).
 SAMPLE_TIME = 2
@@ -66,25 +62,19 @@ def round_sig(x, n=3):
     return round(x * factor) / factor
 
 def putByte(RA, byte):
-    with SMBus(DEVICE_BUS) as bus2:
-        bus2.write_byte_data(DEVICE_ADDR, RA, byte)
+    with SMBus(DEVICE_BUS) as pbus:
+        pbus.write_byte_data(DEVICE_ADDR, RA, byte)
+
+# Reset UPS power control registers
+putByte(0x19, 0)
+putByte(0x1A, 0)
+putByte(0x18, 0)
 
 # Save POWEROFF_LIMIT to text file for sharing with other scripts
 f = open(PATH+'UPS_parameters.txt', 'w')
 f.write("%s" % POWEROFF_LIMIT)
 f.write("\n")
 f.close()
-
-# Store battery voltage discharge protection limit in UPS memory
-# while True:
-#     try:
-#         bus.write_byte_data(DEVICE_ADDR, 0x11, DISCHARGE_LIMIT & 0xFF)
-#         bus.write_byte_data(DEVICE_ADDR, 0x12,
-#                             (DISCHARGE_LIMIT >> 0o10) & 0xFF)
-#         break
-#     except TimeoutError:
-#         time.sleep(0.1)
-#         continue
 
 try:
     with SMBus(DEVICE_BUS) as bus:
@@ -174,11 +164,11 @@ UID2 = "%08X" % (aReceiveBuf[0xFB] << 0o30 | aReceiveBuf[0xFA] << 0o20 |
 print(("{:^60s}").format('UID: ' + UID0 + '-' + UID1 + '-' + UID2))
 print('*'*60)
 
-print(("{:^60s}").format("UPS control registers:  "+"0x18=" +
-                         str(aReceiveBuf[0x18]) + " / 0x19=" +
-                         str(aReceiveBuf[0x19]) + " / 0x1A=" +
-                         str(aReceiveBuf[0x1A])))
-print()
+# print(("{:^60s}").format("UPS control registers:  "
+#                          + "0x18=" + str(aReceiveBuf[0x18])
+#                          + " / 0x19=" + str(aReceiveBuf[0x19])
+#                          + " / 0x1A=" + str(aReceiveBuf[0x1A])))
+# print()
 
 # Update initial GRACE_TIME value to file whenever external power is present
 if ((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000) | \

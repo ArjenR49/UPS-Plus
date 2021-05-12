@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 11-05-2021
+# ar - 12-05-2021
 
 # ''' Halt the Pi, power down, then power up Pi (= perform power cycle) '''
 
 import os
 import time
-# import smbus2
 from smbus2 import SMBus 
 
 # Define I2C bus
@@ -25,7 +24,7 @@ DEVICE_ADDR = 0x17
 # for shut down & power off state
 OMR0x18 = 0    # seconds, power off delay
 OMR0x19 = 0    # boolean, automatic restart or not
-OMR0x1A = 240  # seconds, power up delay
+OMR0x1A = 60  # seconds, power up delay
 
 # Write byte to specified I2C register address
 def putByte(RA, byte):

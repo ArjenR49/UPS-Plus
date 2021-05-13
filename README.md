@@ -14,8 +14,9 @@ I have added rounding to significant bits, because I don't believe in the accura
 
 I changed bit-wise shifting operations (<< and >>) to octal notation just because I find it more clear.
 
-I added TimeoutError exception handling to all reads and writes on the I2C bus, except for the INA devices. They don't seem to cause problems.
-Sometimes my UPS_report reports the batteries to be discharging even though the charger is connected. This happens when the UPS f/w is doing its data colllection about the batteries and shuts off all blue LEDs every two minutes (=sampling interval).
+I added TimeoutError exception handling to all reads and writes on the I2C bus, except for the INA devices where the values are only used for reporting. In the upsPlus.py code which decides whether to start shutdown, however, there is also exception/error handling for the INA-voltage.
+
+Sometimes my UPS_report.py and also upsPlus.py report the batteries to be discharging even though the charger is connected. This appears to happen when the UPS f/w is doing its data colllection about the batteries and shuts off all blue LEDs for a short while every two minutes (=sampling interval). Apparently the batteries are disconnected from the charger during that sampling procedure.
 
 My crontab is intended for stress testing of the power cycle bahaviour of the UPS.
 The sleep x && in the line for PowerCycle.py is to make sure it runs after upsPlus.py.

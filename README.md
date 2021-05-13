@@ -8,7 +8,7 @@ the UPS registers at address 0x17 and offsets 0x18-0x1A I find pretty sensitive 
 
 The PowerCycle.py script that serves to schedule a full power cycle of the Pi, works OK, but the UPS doesn't always restart the Pi. Most often it works. I haven't gotten to the bottom of that.
 
-Sure enough a little after I left home, the Pi was only shut down by the scheduled PowerCycle.py script, but the power to the Pi wasn't cut. I had to switch it off and on manually using the push button. This has been its behaviour no matter what I do. The minute I look the other way, it malfunctions after numerous powwer cycles that did proceed as they should ... very weird.
+Sure enough a little after I left home, the Pi was only shut down by the scheduled PowerCycle.py script, but the power to the Pi wasn't cut. I had to switch it off and on manually using the push button. This has been its behaviour no matter what I do. The minute I look the other way, it malfunctions after numerous power cycles that did proceed as they should ... very weird.
 
 I have added rounding to significant bits, because I don't believe in the accuracy of mV and mA readings ;-) I also like to see Volts and Amps in a report, although I may read them automatically as mA and mV when it is more suitable.
 

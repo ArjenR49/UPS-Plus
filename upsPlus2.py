@@ -17,8 +17,8 @@ from datetime import datetime, timezone
 # (name format: Operation Mode Register Address)
 # for shut down & power off state
 OMR0x18 = 60   # seconds, power off delay
-OMR0x19 = 1     # boolean, automatic restart or not
-OMR0x1A = 0     # seconds, power up delay
+OMR0x19 = 1    # boolean, automatic restart or not
+OMR0x1A = 0    # seconds, power on delay
 
 # Define I2C bus
 DEVICE_BUS = 1
@@ -65,8 +65,8 @@ def putByte(RA, byte):
     with SMBus(DEVICE_BUS) as pbus:
         pbus.write_byte_data(DEVICE_ADDR, RA, byte)
 
-# Reset UPS power control registers
-putByte(0x19, 0)
+# Initialize UPS power control registers
+putByte(0x19, OMR0x19)
 putByte(0x1A, 0)
 putByte(0x18, 0)
 
@@ -180,7 +180,7 @@ if ((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000) | \
 if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
     print(("{:^60s}").format('Charging via USB type C connector\n'))
     print(("{:^60s}").
-          format("In case of power failure lasting longer than " +
+          format("If a power failure lasts for longer than " +
           str(GRACE_TIME)+" min,"))
     print(("{:^60s}").
           format("the UPS will shut down the Pi and power it off."))
@@ -188,11 +188,10 @@ if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
     print(("{:^60s}").format('Charging via micro USB connector\n'))
     print(("{:^60s}").
-          format("In case of power failure lasting longer than " +
-          str(GRACE_TIME) + " min,"))
+          format("If a power failure lasts for longer than " +
+          str(GRACE_TIME)+" min,"))
     print(("{:^60s}").
           format("the UPS will shut down the Pi and power it off."))
-    print('*'*60, "\n")
 else:
     # Read GRACE_TIME from file, decrease by 1 and write back to file
     f = open(PATH+'ExtPowerLost.txt', 'r')
@@ -248,7 +247,7 @@ else:
         # Enable automatic restart on return of external power
         # Enable: write 1 to register 0x19
         # Disable: write 0 to register 0x19
-        putByte(0x19, OMR0x19)
+#        putByte(0x19, OMR0x19)
 
         # Unset UPS power up timer (unit: seconds).
         putByte(0x1A, OMR0x1A)

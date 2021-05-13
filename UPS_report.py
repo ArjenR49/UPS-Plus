@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 12-05-2021
+# ar - 13-05-2021
 
 import os
 import time
@@ -28,6 +28,7 @@ SAMPLE_TIME = 2
 
 ina = INA219(0.00725,address=0x40)
 ina.configure()
+print("*** Data from INA219 at 0x40:")
 print("Raspberry Pi supply voltage:                      %8.3f V" % round_sig(ina.voltage(),n=3))
 print("Raspberry Pi current consumption:                 %8.3f A" % round_sig(ina.current()/1000,n=3))
 print("Raspberry Pi power consumption:                   %8.3f W" % round_sig(ina.power()/1000,n=3))
@@ -35,7 +36,8 @@ print("Raspberry Pi power consumption:                   %8.3f W" % round_sig(in
 print()
 ina = INA219(0.005,address=0x45)
 ina.configure()
-print(        "Battery voltage (from INA219):                    %8.3f V" % round_sig(ina.voltage(),n=3))
+print("*** Data from INA219 at 0x45:")
+print(        "Battery voltage:                                  %8.3f V" % round_sig(ina.voltage(),n=3))
 try:
     if ina.current() > 0:
         print("Battery current (charging):                       %8.3f A" % round_sig(abs(ina.current()/1000),n=3))
@@ -82,6 +84,9 @@ while i < 0x100:
         print(i, ' - ', aReceiveBuf[i], ' - ', e)
         time.sleep(0.1)
 
+print( "*** Remainder of report is based on data collected")
+print(("*** by the UPS f/w and read from memory at 0x{:02X}:").format(DEVICE_ADDR))
+print()
 print("UPS board MCU voltage:                            %8.3f V" % round_sig((aReceiveBuf[0x02] << 0o10 | aReceiveBuf[0x01])/1000,n=3))
 print("Voltage at Pi GPIO header pins:                   %8.3f V" % round_sig((aReceiveBuf[0x04] << 0o10 | aReceiveBuf[0x03])/1000,n=3))
 
@@ -91,7 +96,7 @@ print("Micro USB port input voltage:                     %8.3f V" % round_sig((a
 # Learned from the battery internal resistance change, the longer the use, the more stable the data:
 print("Battery temperature (estimate):                   %8.d°C"  % round_sig(aReceiveBuf[0x0C] << 0o10 | aReceiveBuf[0x0B]))
 
-print()
+#print()
 # Fully charged voltage is learned through charging and discharging:
 print("Batteries fully charged at (learned value):       %8.3f V" % round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=3))
 
@@ -123,14 +128,14 @@ print()
 if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
     print('Charging via USB type C connector\n')
     print(("{:<60s}").format("Should the external power be interrupted long enough"))
-    print(("{:<60s}").format("to cause the battery voltage to drop below "+str(max(DISCHARGE_LIMIT,round_sig(float(POWEROFF_LIMIT)/1000,n=3)))+" V, or"))
-    print(("{:<60s}").format("remain interrupted for more than "+str(GRACE_TIME)+" min,"))
+    print(("{:<60s}").format("to cause the battery voltage to drop below "+str(max(DISCHARGE_LIMIT,round_sig(float(POWEROFF_LIMIT)/1000,n=3)))+" V,"))
+    print(("{:<60s}").format("or remain interrupted for more than "+str(GRACE_TIME)+" min,"))
     print(("{:<60s}").format("the Pi will be halted & the UPS will power it down.\n"))
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
     print('Charging via micro USB connector\n')
     print(("{:<60s}").format("Should the external power be interrupted long enough"))
-    print(("{:<60s}").format("to cause the battery voltage to drop below "+str(max(DISCHARGE_LIMIT,round_sig(float(POWEROFF_LIMIT)/1000,n=3)))+" V, or"))
-    print(("{:<60s}").format("remain interrupted for more than "+str(GRACE_TIME)+" min,"))
+    print(("{:<60s}").format("to cause the battery voltage to drop below "+str(max(DISCHARGE_LIMIT,round_sig(float(POWEROFF_LIMIT)/1000,n=3)))+" V,"))
+    print(("{:<60s}").format("or remain interrupted for more than "+str(GRACE_TIME)+" min,"))
     print(("{:<60s}").format("the Pi will be halted & the UPS will power it down.\n"))
 else:
 #   Not charging.
@@ -143,10 +148,10 @@ else:
         print("*** grace time till shutdown will be left: %d min" % GRACE_TIME)
     print()
 
-print(("{:<60s}").format("UPS power control registers 0x18, 0x19 and 0x1A"))
+print(("{:<60s}").format("UPS power down/up timer registers 0x18 and 0x1A"))
 print(("{:<60s}").format("are set by the upsPlus.py control script"))
-print(("{:<60s}").format("just before a imminent shut down of the Pi"))
-print(("{:<60s}").format("caused by a power failure."))
+print(("{:<60s}").format("just before an imminent shut down of the Pi,"))
+print(("{:<60s}").format("initiated by a power failure."))
 print()
 
 print(("{:<60s}").format("UPS power control registers:  "

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 12-05-2021
+# ar - 13-05-2021
 
 # ''' Halt the Pi, power down, then power up Pi (= perform power cycle) '''
 
@@ -16,15 +16,12 @@ DEVICE_BUS = 1
 # Define device I2C slave address.
 DEVICE_ADDR = 0x17
 
-# Raspberry Pi Communicates with MCU via I2C protocol.
-# bus = smbus2.SMBus(DEVICE_BUS)
-
 # Essential UPS I2C register default values
 # (name format: Operation Mode Register Address)
 # for shut down & power off state
-OMR0x18 = 0    # seconds, power off delay
-OMR0x19 = 0    # boolean, automatic restart or not
-OMR0x1A = 60  # seconds, power up delay
+OMR0x18 = 0   # seconds, power off delay
+OMR0x19 = 0   # boolean, automatic restart or not
+OMR0x1A = 75  # seconds, power on delay
 
 # Write byte to specified I2C register address
 def putByte(RA, byte):
@@ -51,15 +48,14 @@ print()
 #   Enable: write 1 to register 0x19
 #   Disable: write 0 to register 0x19
 putByte(0x19, OMR0x19)
+time.sleep(2)
 
 # For power cycle operation only 'power up' countdown (0x1A) must be set.
 # UPS will cut power to the Pi 5 seconds before the end of the power up
 # countdown, allowing the Pi to sync & halt in an orderly manner,
 # and then turn power to the Pi on again at 0 seconds.
 putByte(0x1A, OMR0x1A)
-
-# Unset power off delay timer
-putByte(0x18, OMR0x18)
+time.sleep(2)
 
 # Halt the Pi without delay.
 os.system("sudo shutdown now")

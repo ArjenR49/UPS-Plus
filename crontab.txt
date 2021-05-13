@@ -32,9 +32,10 @@
 # Running PowerCycle.py ever so often as a stress test ...
 #
 # Do not reboot or run PowerCycle.py when backintime is scheduled to run!
+# Wait for cron scheduled upsPlus.py to lock the lock file first and run.
 # Make reboot or PowerCycle.py wait for upsPlus.py to finish and release the lock file.
-*/15 * * * * [ "$(date '+\%H:\%M')" != "04:00" ] && flock -w 15 $HOME/UPS+/UPS_job.lock python3 $HOME/UPS+/PowerCycle2.py
-#*/15 * * * * [ "$(date '+\%H:\%M')" != "04:00" ] && flock -w 15 $HOME/UPS+/UPS_job.lock sudo shutdown --reboot now
+*/15 * * * * [ "$(date '+\%H:\%M')" != "04:00" ] && sleep 5 && flock -w 15 $HOME/UPS+/UPS_job.lock python3 $HOME/UPS+/PowerCycle2.py
+#*/15 * * * * [ "$(date '+\%H:\%M')" != "04:00" ] && sleep 5 && flock -w 15 $HOME/UPS+/UPS_job.lock sudo shutdown --reboot now
 
 #Back In Time system entry, this will be edited by the gui:
 0 4 * * * /usr/bin/nice -n 19 /usr/bin/ionice -c2 -n7 /usr/bin/backintime backup-job >/dev/null

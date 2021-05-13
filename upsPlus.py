@@ -28,11 +28,12 @@ DEVICE_ADDR = 0x17
 
 # Set threshold for UPS automatic power-off to prevent
 # destroying the batteries by excessive discharge (unit: mV).
-DISCHARGE_LIMIT = 2800
+# DISCHARGE_LIMIT (a.k.a. protection voltage) will be stored in memory at 0x11-0x12
+DISCHARGE_LIMIT = 3000
 
 # Set threshold for UPS power-off conserving battery power &
 # providing ability to overcome possibly repeated blackouts (unit: mV).
-POWEROFF_LIMIT = 3300
+POWEROFF_LIMIT = 3500
 # POWEROFF_LIMIT = DISCHARGE_LIMIT
 
 # Keep Pi running for maximum <GRACE_TIME> 'units' of time after blackout
@@ -76,6 +77,7 @@ f.write("%s" % POWEROFF_LIMIT)
 f.write("\n")
 f.close()
 
+# Store DISCHARGE_LIMIT (a.k.a. protection voltage) in memory at 0x11-0x12
 try:
     with SMBus(DEVICE_BUS) as bus:
         bus.write_byte_data(DEVICE_ADDR, 0x11, DISCHARGE_LIMIT & 0xFF)

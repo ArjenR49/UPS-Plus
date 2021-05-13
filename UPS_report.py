@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 13-05-2021
+# ar - 14-05-2021
 
 import os
 import time
@@ -87,31 +87,32 @@ while i < 0x100:
 print( "*** Remainder of report is based on data collected")
 print(("*** by the UPS f/w and read from memory at 0x{:02X}:").format(DEVICE_ADDR))
 print()
-print("UPS board MCU voltage:                            %8.3f V" % round_sig((aReceiveBuf[0x02] << 0o10 | aReceiveBuf[0x01])/1000,n=3))
-print("Voltage at Pi GPIO header pins:                   %8.3f V" % round_sig((aReceiveBuf[0x04] << 0o10 | aReceiveBuf[0x03])/1000,n=3))
+print("UPS board MCU voltage:                              %6.3f V" % round_sig((aReceiveBuf[0x02] << 0o10 | aReceiveBuf[0x01])/1000,n=3))
+print("Voltage at Pi GPIO header pins:                     %6.3f V" % round_sig((aReceiveBuf[0x04] << 0o10 | aReceiveBuf[0x03])/1000,n=3))
 
-print("USB type C port input voltage:                    %8.3f V" % round_sig((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07])/1000,n=3))
-print("Micro USB port input voltage:                     %8.3f V" % round_sig((aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09])/1000,n=3))
+print("USB type C port input voltage:                      %6.3f V" % round_sig((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07])/1000,n=3))
+print("Micro USB port input voltage:                       %6.3f V" % round_sig((aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09])/1000,n=3))
 
 # Learned from the battery internal resistance change, the longer the use, the more stable the data:
-print("Battery temperature (estimate):                   %8.d°C"  % round_sig(aReceiveBuf[0x0C] << 0o10 | aReceiveBuf[0x0B]))
+print("Battery temperature (estimate):                     %6.d°C"  % round_sig(aReceiveBuf[0x0C] << 0o10 | aReceiveBuf[0x0B]))
 
 #print()
 # Fully charged voltage is learned through charging and discharging:
-print("Batteries fully charged at (learned value):       %8.3f V" % round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=3))
+print("Batteries fully charged at (learned value):         %6.3f V" % round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=3))
 
 # This value is inaccurate during charging:
-print("Current voltage at battery terminals:             %8.3f V" % round_sig((aReceiveBuf[0x06] << 0o10 | aReceiveBuf[0x05])/1000,n=3))
+print("Current voltage at battery terminals:               %6.3f V" % round_sig((aReceiveBuf[0x06] << 0o10 | aReceiveBuf[0x05])/1000,n=3))
 
 # Voltage below which UPS shuts down the Pi & powers off to conserve battery capacity
-print("UPS power-off voltage limit is set at:            %8.3f V" % round_sig(float(POWEROFF_LIMIT)/1000,n=3))
+print("UPS power-off voltage limit is set at:              %6.3f V" % round_sig(float(POWEROFF_LIMIT)/1000,n=3))
 
-# Fully discharged voltage is learned through charging and discharging:
-print("Batteries fully discharged at (learned value):    %8.3f V" % round_sig((aReceiveBuf[0x10] << 0o10 | aReceiveBuf[0x0F])/1000,n=3))
+# Fully discharged voltage is learned through charging and discharging (a.k.a. empty voltage):
+print("Batteries fully discharged at (partially learned):  %6.3f V" % round_sig((aReceiveBuf[0x10] << 0o10 | aReceiveBuf[0x0F])/1000,n=3))
 
-# The deep discharge limit value can be set:
+# The deep discharge limit value is stored in memory at 0x11-0x12 by upsPlus.py:
+# DISCHARGE_LIMIT (a.k.a. protection voltage)
 DISCHARGE_LIMIT=(aReceiveBuf[0x12] << 0o10 | aReceiveBuf[0x11])/1000
-print("Battery deep discharge limit is set at:           %8.3f V" % round_sig(DISCHARGE_LIMIT,n=3))
+print("Battery deep discharge limit is set at:             %6.3f V" % round_sig(DISCHARGE_LIMIT,n=3))
 
 # At least one complete charge and discharge cycle needs to pass before this value is meaningful:
 print("Remaining battery capacity:                       %8.d %%" % (aReceiveBuf[0x14] << 0o10 | aReceiveBuf[0x13]))

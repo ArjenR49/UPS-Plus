@@ -1,4 +1,0 @@
-#!/bin/bash
-# ar - 09-05-2021
-
-flock -w 5 --verbose $HOME/UPS+/UPS_job.lock python3 $HOME/UPS+/UPS_report.py

@@ -18,8 +18,8 @@ from datetime import datetime, timezone
 # for shut down & power off state
 # Default values:
 OMR0x18D = 0    # seconds, power off delay
-OMR0x19D = 0    # boolean, automatic restart or not
-OMR0x1AD = 120  # seconds, power on delay (special purpose 120 as suggested by nickfox-taterli)
+OMR0x19D = 1    # boolean, automatic restart or not
+OMR0x1AD = 0    # seconds, power on delay (special purpose 120? as suggested by nickfox-taterli)
 # Values for shutdown event:
 OMR0x18S = 60   # seconds, power off delay
 OMR0x19S = 1    # boolean, automatic restart or not

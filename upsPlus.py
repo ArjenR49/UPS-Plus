@@ -43,7 +43,7 @@ POWEROFF_LIMIT = 3500
 # Keep Pi running for maximum <GRACE_TIME> 'units' of time after blackout
 # (unit = upsPlus.py cron job interval, normally 1 min)
 GRACE_TIME = 1440
-GRACE_TIME = 2
+GRACE_TIME = 5
 # Minimum practical value is 2 ...
 GRACE_TIME = max(GRACE_TIME, 2)
 

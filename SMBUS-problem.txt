@@ -57,3 +57,55 @@ Traceback (most recent call last):
     print("i: %02X" % i, " - byte: %02X" % bReceiveBuf[i])
 IndexError: list index out of range
 pi@RPI-HUB:~ $
+
+
+pi@RPI-HUB:~ $ python3 $HOME/UPS+/UPS_report.py
+*** Data from INA219 at 0x40:
+Raspberry Pi supply voltage:                         4.920 V
+Raspberry Pi current consumption:                    2.340 A
+Raspberry Pi power consumption:                     11.000 W
+
+*** Data from INA219 at 0x45:
+Battery voltage:                                     4.220 V
+Battery current (charging):                          0.232 A
+Power supplied to the batteries:                     1.010 W
+
+Traceback (most recent call last):
+  File "/home/pi/UPS+/UPS_report.py", line 81, in <module>
+    aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
+  File "/home/pi/.local/lib/python3.7/site-packages/smbus2/smbus2.py", line 433, in read_byte_data
+    ioctl(self.fd, I2C_SMBUS, msg)
+TimeoutError: [Errno 110] Connection timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/pi/UPS+/UPS_report.py", line 84, in <module>
+    print(i, ' - ', aReceiveBuf[i], ' - ', e)
+IndexError: list index out of range
+pi@RPI-HUB:~ $
+
+*** Data from INA219 at 0x45:
+Battery voltage:                                     4.160 V
+Battery current (discharging):                       2.800 A
+Traceback (most recent call last):
+  File "/home/pi/UPS+/UPS_report.py", line 47, in <module>
+    print("Battery power consumption:                        %8.3f W" % round_sig(ina.power()/1000,n=3))
+  File "/home/pi/.local/lib/python3.7/site-packages/ina219.py", line 204, in power
+    self._handle_current_overflow()
+  File "/home/pi/.local/lib/python3.7/site-packages/ina219.py", line 245, in _handle_current_overflow
+    while self._has_current_overflow():
+  File "/home/pi/.local/lib/python3.7/site-packages/ina219.py", line 359, in _has_current_overflow
+    ovf = self._read_voltage_register() & self.__OVF
+  File "/home/pi/.local/lib/python3.7/site-packages/ina219.py", line 367, in _read_voltage_register
+    return self.__read_register(self.__REG_BUSVOLTAGE)
+  File "/home/pi/.local/lib/python3.7/site-packages/ina219.py", line 394, in __read_register
+    register_value = self._i2c.readU16BE(register)
+  File "/home/pi/.local/lib/python3.7/site-packages/Adafruit_GPIO/I2C.py", line 190, in readU16BE
+    return self.readU16(register, little_endian=False)
+  File "/home/pi/.local/lib/python3.7/site-packages/Adafruit_GPIO/I2C.py", line 164, in readU16
+    result = self._bus.read_word_data(self._address,register) & 0xFFFF
+  File "/home/pi/.local/lib/python3.7/site-packages/Adafruit_PureIO/smbus.py", line 224, in read_word_data
+    ioctl(self._device.fileno(), I2C_RDWR, request)
+TimeoutError: [Errno 110] Connection timed out
+pi@RPI-HUB:~ $

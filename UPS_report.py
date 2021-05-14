@@ -85,7 +85,8 @@ while i < 0x100:
         time.sleep(0.1)
 
 print( "*** Remainder of report is based on data collected")
-print(("*** by the UPS f/w and read from memory at 0x{:02X}:").format(DEVICE_ADDR))
+print(("*** by the UPS f/w and read from memory at 0x{:02X}").format(DEVICE_ADDR))
+print( "--- except value(s) marked with *")
 print()
 print("UPS board MCU voltage:                              %6.3f V" % round_sig((aReceiveBuf[0x02] << 0o10 | aReceiveBuf[0x01])/1000,n=3))
 print("Voltage at Pi GPIO header pins:                     %6.3f V" % round_sig((aReceiveBuf[0x04] << 0o10 | aReceiveBuf[0x03])/1000,n=3))
@@ -97,6 +98,8 @@ print("Micro USB port input voltage:                       %6.3f V" % round_sig(
 print("Battery temperature (estimate):                     %6.d°C"  % round_sig(aReceiveBuf[0x0C] << 0o10 | aReceiveBuf[0x0B]))
 
 #print()
+print("Automatic detection of battery type (0=yes)       %8.d" % (aReceiveBuf[0x2A]))
+
 # Fully charged voltage is learned through charging and discharging:
 print("Batteries fully charged at (learned value):         %6.3f V" % round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=3))
 
@@ -104,7 +107,7 @@ print("Batteries fully charged at (learned value):         %6.3f V" % round_sig(
 print("Current voltage at battery terminals:               %6.3f V" % round_sig((aReceiveBuf[0x06] << 0o10 | aReceiveBuf[0x05])/1000,n=3))
 
 # Voltage below which UPS shuts down the Pi & powers off to conserve battery capacity
-print("UPS power-off voltage limit is set at:              %6.3f V" % round_sig(float(POWEROFF_LIMIT)/1000,n=3))
+print("* My power-off voltage limit is set at:             %6.3f V" % round_sig(float(POWEROFF_LIMIT)/1000,n=3))
 
 # Fully discharged voltage is learned through charging and discharging (a.k.a. empty voltage):
 print("Batteries fully discharged at (partially learned):  %6.3f V" % round_sig((aReceiveBuf[0x10] << 0o10 | aReceiveBuf[0x0F])/1000,n=3))

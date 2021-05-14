@@ -15,7 +15,6 @@ from datetime import datetime, timezone
 
 # Essential UPS I2C register default values
 # (name format: Operation Mode Register Address)
-# for shut down & power off state
 # Default values:
 OMR0x18D = 0    # seconds, power off delay
 OMR0x19D = 1    # boolean, automatic restart or not

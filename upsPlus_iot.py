@@ -1,14 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# modified by ar - 08-05-2021
+# modified by ar - 14-05-2021
 
 # ''' Update the status of batteries to IoT platform '''
 
 import time
 import smbus2
 import requests
-from ina219 import INA219,DeviceRangeError
+from ina219 import INA219, DeviceRangeError
 import random
 from datetime import datetime, timezone
 

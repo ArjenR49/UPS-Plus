@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 12-05-2021
+# ar - 14-05-2021
 
 # ''' UPS Plus v.5 control script '''
 
@@ -16,9 +16,14 @@ from datetime import datetime, timezone
 # Essential UPS I2C register default values
 # (name format: Operation Mode Register Address)
 # for shut down & power off state
-OMR0x18 = 60   # seconds, power off delay
-OMR0x19 = 1    # boolean, automatic restart or not
-OMR0x1A = 0    # seconds, power on delay
+# Default values:
+OMR0x18D = 0    # seconds, power off delay
+OMR0x19D = 0    # boolean, automatic restart or not
+OMR0x1AD = 120  # seconds, power on delay (special purpose 120 as suggested by nickfox-taterli)
+# Values for shutdown event:
+OMR0x18S = 60   # seconds, power off delay
+OMR0x19S = 1    # boolean, automatic restart or not
+OMR0x1AS = 0    # seconds, power on delay
 
 # Define I2C bus
 DEVICE_BUS = 1
@@ -67,9 +72,9 @@ def putByte(RA, byte):
         pbus.write_byte_data(DEVICE_ADDR, RA, byte)
 
 # Initialize UPS power control registers
-putByte(0x19, OMR0x19)
-putByte(0x1A, 0)
-putByte(0x18, 0)
+putByte(0x19, OMR0x19D)
+putByte(0x1A, OMR0x1AD)
+putByte(0x18, OMR0x18D) 
 
 # Save POWEROFF_LIMIT to text file for sharing with other scripts
 f = open(PATH+'UPS_parameters.txt', 'w')
@@ -249,14 +254,14 @@ else:
         # Enable automatic restart on return of external power
         # Enable: write 1 to register 0x19
         # Disable: write 0 to register 0x19
-#        putByte(0x19, OMR0x19)
+        putByte(0x19, OMR0x19S)
 
         # Unset UPS power up timer (unit: seconds).
-        putByte(0x1A, OMR0x1A)
+        putByte(0x1A, OMR0x1AS)
 
         # Set UPS power down timer (unit: seconds)
         # allowing the Pi time to sync & shutdown.
-        putByte(0x18, OMR0x18)
+        putByte(0x18, OMR0x18S)
 
         time.sleep(2)  # Allow UPS F/W to adjust to the new settings.
 

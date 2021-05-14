@@ -81,7 +81,8 @@ while i < 0x100:
             aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
             i += 1
     except TimeoutError as e:
-        print(i, ' - ', aReceiveBuf[i], ' - ', e)
+        print('i=',i)
+        print('byte read=', aReceiveBuf[i], ' error:', e)
         time.sleep(0.1)
 
 print( "*** Remainder of report is based on data collected")
@@ -98,7 +99,7 @@ print("Micro USB port input voltage:                       %6.3f V" % round_sig(
 print("Battery temperature (estimate):                     %6.d°C"  % round_sig(aReceiveBuf[0x0C] << 0o10 | aReceiveBuf[0x0B]))
 
 #print()
-print("Automatic detection of battery type (0=yes)       %8.d" % (aReceiveBuf[0x2A]))
+print("Automatic detection of battery type (0=yes, 1=no)   %6.d" % (aReceiveBuf[0x2A]))
 
 # Fully charged voltage is learned through charging and discharging:
 print("Batteries fully charged at (learned value):         %6.3f V" % round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=3))

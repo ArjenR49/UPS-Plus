@@ -76,7 +76,7 @@ putByte(0x1A, OMR0x1AD)
 putByte(0x18, OMR0x18D) 
 
 # Save POWEROFF_LIMIT to text file for sharing with other scripts
-f = open(PATH+'UPS_parameters.txt', 'w')
+f = open(PATH+'PowerOffLimit.txt', 'w')
 f.write("%s" % POWEROFF_LIMIT)
 f.write("\n")
 f.close()
@@ -179,7 +179,7 @@ print('*'*60)
 # Update initial GRACE_TIME value to file whenever external power is present
 if ((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000) | \
    ((aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000):
-    f = open(PATH+'ExtPowerLost.txt', 'w')
+    f = open(PATH+'GraceTime.txt', 'w')
     f.write("%s" % GRACE_TIME)
     f.close()
 
@@ -200,7 +200,7 @@ elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
           format("the UPS will shut down the Pi and power it off."))
 else:
     # Read GRACE_TIME from file, decrease by 1 and write back to file
-    f = open(PATH+'ExtPowerLost.txt', 'r')
+    f = open(PATH+'GraceTime.txt', 'r')
     GRACE_TIME = int(f.read())-1
     f.close()
 
@@ -274,7 +274,7 @@ else:
     # Control is now left to the UPS' F/W and MCU ...
     # Otherwise update GRACE_TIME on file and end script execution.
     else:
-        f = open(PATH+'ExtPowerLost.txt', 'w')
+        f = open(PATH+'GraceTime.txt', 'w')
         f.write("%s" % (GRACE_TIME))
         f.close()
 

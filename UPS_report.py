@@ -52,14 +52,14 @@ print()
 # Path for parameter files
 PATH = str(os.getenv('HOME'))+'/UPS+/'
 
-f = open(PATH+'UPS_parameters.txt','rt')
+f = open(PATH+'PowerOffLimit.txt','rt')
 line = f.readline()
 POWEROFF_LIMIT = line.strip()
 #line = f.readline()
 #POWERLOSS_TIMER = line.strip()
 f.close()
 
-f = open(PATH+'ExtPowerLost.txt','r')
+f = open(PATH+'GraceTime.txt','r')
 GRACE_TIME = int(f.read())
 f.close()
 

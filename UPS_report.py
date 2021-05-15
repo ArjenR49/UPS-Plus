@@ -95,6 +95,7 @@ print("Voltage at Pi GPIO header pins:                     %6.3f V" % round_sig(
 print("USB type C port input voltage:                      %6.3f V" % round_sig((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07])/1000,n=3))
 print("Micro USB port input voltage:                       %6.3f V" % round_sig((aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09])/1000,n=3))
 
+print()
 # Learned from the battery internal resistance change, the longer the use, the more stable the data:
 print("Battery temperature (estimate):                     %6.d°C"  % round_sig(aReceiveBuf[0x0C] << 0o10 | aReceiveBuf[0x0B]))
 

@@ -30,3 +30,20 @@ The UPS is quite unforgiving and has no idea of what the Pi is doing, whether it
 I intend to run motioneye and VNC (server and client) on this Pi4, but I disabled motioneye for now, so it cannot interfere.
 
 There is probably more to say about my experiences with the UPS and scripting, but it'll have to wait until later.
+
+------------------------------------------------------------
+
+Now running on f/w v.7:
+Implemented the watchdog function in upsPlus.py per suggestion from Nick Taterli.
+Setting the 'reboot' timer 0x1A to >=120 - I chose 180 - will make the UPS f/w countdown to cutting the power to the Pi - abruptly - and reconnect the power after about 9 minutes!
+As long as upsPlus.py executes every 60 seconds (cron), the reboot timer 0x1A will be reset to >=120 and the Pi will keep running, because the timer never reaches 0.
+However, if the Pi freezes, upsPlus.py will stop updating 0x1A and the reboot timer will eventually reach 0, which is when the UPS bluntly cuts the power.
+Register 0x19 needs to be 0 for this to work. Check the code and the comments in upsPlus.py.
+Voilá, a watchdog function!
+
+Of course cutting the power like this can damage your file system, but then, what else is there to do if the OS freezes?
+
+Running PowerCycle.py will still also cause power-off and power on after 9 minutes, but it will do a shutdown of the OS before cutting the power. Take care the power-off timer value is large enough to allow your Pi to shutdown in an orderly manner, as the UPS has no clue about the state of the Pi or its OS.
+Thirty seconds may seem long enough, but in some circumstances a Pi might take longer. I prefer longer power-off delays.
+The delay until restart used to be 5 seconds on f/w v.5, but it is now a surprising 9 minutes.
+

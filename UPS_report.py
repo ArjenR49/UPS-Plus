@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 15-05-2021
+# ar - 16-05-2021
 
 import os
 import time
@@ -24,7 +24,6 @@ def round_sig(x, n=3):
 
 DEVICE_BUS = 1
 DEVICE_ADDR = 0x17
-SAMPLE_TIME = 2
 
 ina = INA219(0.00725,address=0x40)
 ina.configure()
@@ -122,7 +121,11 @@ print("Battery deep discharge limit is set at:             %6.3f V" % round_sig(
 # At least one complete charge and discharge cycle needs to pass before this value is meaningful:
 print("Remaining battery capacity:                       %8.d %%" % (aReceiveBuf[0x14] << 0o10 | aReceiveBuf[0x13]))
 
-print("Sampling interval:                                %8.d min" % (aReceiveBuf[0x16] << 0o10 | aReceiveBuf[0x15]))
+# For a few seconds all blue charging level LEDs are off
+# and only the batteries deliver power to the Pi
+# as sampling of battery characteristics takes place.
+# The interval between sampling events is normally 2 minutes.
+print("Battery sampling interval (all 4 blue LEDs off):  %8.d min" % (aReceiveBuf[0x16] << 0o10 | aReceiveBuf[0x15]))
 
 print()
 if aReceiveBuf[0x17] == 1:

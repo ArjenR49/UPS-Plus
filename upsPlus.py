@@ -13,10 +13,9 @@ from math import log10, floor
 from ina219 import INA219, DeviceRangeError
 from datetime import datetime, timezone
 
-# Essential UPS I2C power control register settings
+# Essential UPS I2C power control registers are 0x18, 0x19 and 0x1A
 # (name format: Operation Mode, offset, purpose)
-
-# Default values
+# *** Default values ***
 # for normal operation, incl. optional watchdog timer as suggested by GeeekPi,
 # with or without automatic restart after 9-10 minutes.
 #OMR0x18D = 0    # seconds, power-off delay 
@@ -24,16 +23,15 @@ OMR0x18D = 180  # seconds, power-off delay (for watchdog set >=120, no auto-rest
 OMR0x19D = 0    # boolean, automatic restart (1) or not (0) after ext. power failure
 OMR0x1AD = 0    # seconds, power-on delay
 #OMR0x1AD = 180  # seconds, power-on delay (for watchdog set >=120, 10 min auto-restart)
-
-# Shutdown event values:
+# *** Shutdown event values ***
 OMR0x18S = 60   # seconds, power-off delay
 OMR0x19S = 1    # boolean, automatic restart (1) or not (0) after ext. power failure
 OMR0x1AS = 0    # seconds, power-on delay
 
-# Define I2C bus
+# Set I2C bus
 DEVICE_BUS = 1
 
-# Define device I2C slave address.
+# Set device I2C slave address
 DEVICE_ADDR = 0x17
 
 # Set threshold for UPS automatic power-off to prevent
@@ -52,9 +50,6 @@ GRACE_TIME = 1440
 GRACE_TIME = 5
 # Minimum practical value is 2 ...
 GRACE_TIME = max(GRACE_TIME, 2)
-
-# Set the sample period, unit: min (usually 2).
-SAMPLE_TIME = 2
 
 # Path for parameter files
 PATH = str(os.getenv('HOME'))+'/UPS+/'
@@ -81,7 +76,7 @@ putByte(0x19, OMR0x19D)
 putByte(0x1A, OMR0x1AD)
 putByte(0x18, OMR0x18D)
 # Allow I2C bus some time to settle
-time.sleep(0.25)
+time.sleep(0.1)
 
 # Save POWEROFF_LIMIT to text file for sharing with other scripts
 f = open(PATH+'PowerOffLimit.txt', 'w')

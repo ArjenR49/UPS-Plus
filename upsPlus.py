@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 14-05-2021
+# ar - 15-05-2021
 
 # ''' UPS Plus v.5 control script '''
 
@@ -13,16 +13,16 @@ from math import log10, floor
 from ina219 import INA219, DeviceRangeError
 from datetime import datetime, timezone
 
-# Essential UPS I2C register default values
-# (name format: Operation Mode Register Address)
-# Default values:
-OMR0x18D = 0    # seconds, power off delay
-OMR0x19D = 1    # boolean, automatic restart or not
-OMR0x1AD = 0    # seconds, power on delay (special purpose 120? as suggested by nickfox-taterli)
-# Values for shutdown event:
-OMR0x18S = 60   # seconds, power off delay
-OMR0x19S = 1    # boolean, automatic restart or not
-OMR0x1AS = 0    # seconds, power on delay
+# Essential UPS I2C power control register settings
+# (name format: Operation Mode, offset, purpose)
+# Default values (normal operation):
+OMR0x18D = 0    # seconds, power-off delay
+OMR0x19D = 0    # boolean, automatic restart (1) or not (0) after ext. power failure
+OMR0x1AD = 180  # seconds, power-on delay (for watchdog function >=120 as suggested by Nick Tater)
+# Shutdown event values:
+OMR0x18S = 60   # seconds, power-off delay
+OMR0x19S = 1    # boolean, automatic restart (1) or not (0) after ext. power failure
+OMR0x1AS = 0    # seconds, power-on delay
 
 # Define I2C bus
 DEVICE_BUS = 1
@@ -170,11 +170,11 @@ UID2 = "%08X" % (aReceiveBuf[0xFB] << 0o30 | aReceiveBuf[0xFA] << 0o20 |
 print(("{:^60s}").format('UID: ' + UID0 + '-' + UID1 + '-' + UID2))
 print('*'*60)
 
-# print(("{:^60s}").format("UPS control registers:  "
-#                          + "0x18=" + str(aReceiveBuf[0x18])
-#                          + " / 0x19=" + str(aReceiveBuf[0x19])
-#                          + " / 0x1A=" + str(aReceiveBuf[0x1A])))
-# print()
+print(("{:^60s}").format("UPS power control registers:  "
+                         + "0x18=" + str(aReceiveBuf[0x18])
+                         + " / 0x19=" + str(aReceiveBuf[0x19])
+                         + " / 0x1A=" + str(aReceiveBuf[0x1A])))
+print()
 
 # Update initial GRACE_TIME value to file whenever external power is present
 if ((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000) | \
@@ -189,7 +189,7 @@ if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
           format("If a power failure lasts for longer than " +
           str(GRACE_TIME)+" min,"))
     print(("{:^60s}").
-          format("the UPS will shut down the Pi and power it off."))
+          format("the UPS will halt the OS/Pi and then power it off."))
     print('*'*60, "\n")
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
     print(("{:^60s}").format('Charging via micro USB connector\n'))
@@ -197,7 +197,7 @@ elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
           format("If a power failure lasts for longer than " +
           str(GRACE_TIME)+" min,"))
     print(("{:^60s}").
-          format("the UPS will shut down the Pi and power it off."))
+          format("the UPS will halt the Pi and then power it off."))
 else:
     # Read GRACE_TIME from file, decrease by 1 and write back to file
     f = open(PATH+'GraceTime.txt', 'r')

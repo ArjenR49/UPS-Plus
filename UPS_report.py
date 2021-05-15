@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 14-05-2021
+# ar - 15-05-2021
 
 import os
 import time
@@ -145,18 +145,18 @@ elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
 else:
 #   Not charging.
     print("*** EXTERNAL POWER LOST! RUNNING ON BATTERY POWER!")
-    print("*** UPS power timers will be set before shutdown,")
-    print("*** as soon as the UPS control script runs, and")
+    print("*** As soon as the UPS control script runs, timer")
+    print("*** registers 0x18-0x1A will be set appropriately.")
     if (GRACE_TIME==0):
-        print("*** the UPS will make the Pi shut down!")
+        print("*** A shutdown command will be sent to the OS/Pi!")
     else:
-        print("*** grace time till shutdown will be left: %d min" % GRACE_TIME)
+        print("*** Grace time till shutdown is left: %d min" % GRACE_TIME)
     print()
 
-print(("{:<60s}").format("UPS power down/up timer registers 0x18 and 0x1A"))
+print(("{:<60s}").format("UPS power-off/on timer registers 0x18 and 0x1A"))
 print(("{:<60s}").format("are set by the upsPlus.py control script"))
-print(("{:<60s}").format("just before an imminent shut down of the Pi,"))
-print(("{:<60s}").format("initiated by a power failure."))
+print(("{:<60s}").format("just before an imminent shut down of the Pi"))
+print(("{:<60s}").format("as initiated by a power failure."))
 print()
 
 print(("{:<60s}").format("UPS power control registers:  "
@@ -164,19 +164,19 @@ print(("{:<60s}").format("UPS power control registers:  "
                          + " / 0x19=" + str(aReceiveBuf[0x19])
                          + " / 0x1A=" + str(aReceiveBuf[0x1A])))
 if aReceiveBuf[0x18] == 0:
-    print('0x18: UPS power down timer not set.')
+    print('0x18 - UPS power-off timer not set.')
 else:
-    print("0x18: UPS power down timer set to: %8.d sec" % (aReceiveBuf[0x18]))
+    print("0x18 - UPS power-off timer set to: %8.d sec" % (aReceiveBuf[0x18]))
     
 if aReceiveBuf[0x19] == 0x01:
-    print(("{:<60s}").format("0x19: Automatic restart upon return of external power"))
+    print(("{:<60s}").format("0x19 - Automatic restart upon return of external power"))
 else:
-    print(("{:<60s}").format("0x19: No automatic restart upon return of external power"))
+    print(("{:<60s}").format("0x19 - No automatic restart upon return of external power"))
 
 if aReceiveBuf[0x1A] == 0:
-    print('0x1A: UPS power up timer not set.')
+    print('0x1A - UPS power-up timer not set.')
 else:
-    print("0x1A: UPS power up timer set to: %8.d sec" % (aReceiveBuf[0x1A]))
+    print("0x1A - UPS power-up/watchdog timer set to: %3.d sec" % (aReceiveBuf[0x1A]))
 print()
 
 print("Accumulated running time:                         %8.d min" % round((aReceiveBuf[0x1F] << 0o30 | aReceiveBuf[0x1E] << 0o20 | aReceiveBuf[0x1D] << 0o10 | aReceiveBuf[0x1C])/60))

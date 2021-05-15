@@ -35,15 +35,18 @@ There is probably more to say about my experiences with the UPS and scripting, b
 
 Now running on f/w v.7:
 Implemented the watchdog function in upsPlus.py per suggestion from Nick Taterli.
-Setting the 'reboot' timer 0x1A to >=120 - I chose 180 - will make the UPS f/w count down to cutting the power to the Pi - abruptly - and reconnect the power after about 9 minutes!
-As long as upsPlus.py executes every 60 seconds (cron), the reboot timer 0x1A will be reset to >=120 and the Pi will keep running, because the timer never reaches 0.
-However, if the Pi freezes, upsPlus.py will stop updating 0x1A and the reboot timer will eventually reach 0, which is when the UPS bluntly cuts the power.
+Setting either timer 0x18 or 0x1A to >=120 - I chose 180 - will make the UPS f/w count down to cutting the power to the Pi - abruptly ...
+If 0x1A is set to >= 120, the UPS will reconnect the power after about 9 minutes and the Pi will restart automatically!
+If you choose to set 0x18 to >=120, there is no auto-restart. Start by pressing the UPS button.
+
+As long as upsPlus.py executes every 60 seconds (cron), the timer 0x18 or 0x1A will be reset to >=120 and the Pi will keep running, because the timer never reaches 0.
+However, if the Pi freezes, upsPlus.py will stop updating the timer and the reboot timer will eventually reach 0, which is when the UPS bluntly cuts the power.
 Register 0x19 needs to be 0 for this to work. Check the code and the comments in upsPlus.py.
-Voilá, a watchdog function!
+Voilá, a watchdog function! Either with or without auto-restart.
 
 Of course cutting the power like this can damage your file system, but then, what else is there to do if the OS freezes?
 
-You can test the watchdog by temporarily commenting out 'putByte(0x1A, OMR0x1AD)' (currently) on line 75 of upsPlus.py. You can follow the counting down when you run UPS_report.py repeatedly from a terminal until 0x1A reaches 0 (perhaps actually more like 5 seconds) and the power is abruptly cut. Make a clone of your OS before, if you are worried that cutting the power like that may damage your OS. (I would advise using rpi-clone. It will not take much time to update your clone, as it uses rsync and will copy only the changes.)
+You can test the watchdog by temporarily commenting out either 'putByte(0x1A, OMR0x1AD)' or 'putByte(0x18, OMR0x18D)' (currently) around line 75 of upsPlus.py. You can follow the counting down when you run UPS_report.py repeatedly from a terminal until 0x18 or 0x1A reaches 0 (perhaps actually more like 5 seconds) and the power is abruptly cut. Make a clone of your OS before, if you are worried that cutting the power like that may damage your OS. (I would advise using rpi-clone. It will not take much time to update your clone, as it uses rsync and will copy only the changes.)
 
 Running PowerCycle.py will still also cause power-off and power on after 9 minutes, but it will do a shutdown of the OS before cutting the power. Take care the power-off timer value is large enough to allow your Pi to shutdown in an orderly manner, as the UPS has no clue about the state of the Pi or its OS.
 Thirty seconds may seem long enough, but in some circumstances a Pi might take longer. I prefer longer power-off delays.

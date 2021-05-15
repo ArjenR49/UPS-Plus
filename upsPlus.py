@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 15-05-2021
+# ar - 16-05-2021
 
 # ''' UPS Plus v.5 control script '''
 
@@ -79,7 +79,9 @@ def putByte(RA, byte):
 # Initialize UPS power control registers
 putByte(0x19, OMR0x19D)
 putByte(0x1A, OMR0x1AD)
-putByte(0x18, OMR0x18D) 
+putByte(0x18, OMR0x18D)
+# Allow I2C bus some time to settle
+time.sleep(0.25)
 
 # Save POWEROFF_LIMIT to text file for sharing with other scripts
 f = open(PATH+'PowerOffLimit.txt', 'w')
@@ -177,7 +179,7 @@ print(("{:^60s}").format('UID: ' + UID0 + '-' + UID1 + '-' + UID2))
 print('*'*60)
 
 print(("{:^60s}").format("UPS power control registers:  "
-                         + "0x18=" + str(aReceiveBuf[0x18])
+                         +    "0x18=" + str(aReceiveBuf[0x18])
                          + " / 0x19=" + str(aReceiveBuf[0x19])
                          + " / 0x1A=" + str(aReceiveBuf[0x1A])))
 print()
@@ -192,7 +194,7 @@ if ((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000) | \
 if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
     print(("{:^60s}").format('Charging via USB type C connector\n'))
     print(("{:^60s}").
-          format("If a power failure lasts for longer than " +
+          format("If a power failure lasts for longer than ca. " +
           str(GRACE_TIME)+" min,"))
     print(("{:^60s}").
           format("the UPS will halt the OS/Pi and then power it off."))
@@ -200,7 +202,7 @@ if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
     print(("{:^60s}").format('Charging via micro USB connector\n'))
     print(("{:^60s}").
-          format("If a power failure lasts for longer than " +
+          format("If a power failure lasts for longer than ca. " +
           str(GRACE_TIME)+" min,"))
     print(("{:^60s}").
           format("the UPS will halt the Pi and then power it off."))

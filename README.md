@@ -35,7 +35,7 @@ There is probably more to say about my experiences with the UPS and scripting, b
 
 Now running on f/w v.7:
 Implemented the watchdog function in upsPlus.py per suggestion from Nick Taterli.
-Setting the 'reboot' timer 0x1A to >=120 - I chose 180 - will make the UPS f/w countdown to cutting the power to the Pi - abruptly - and reconnect the power after about 9 minutes!
+Setting the 'reboot' timer 0x1A to >=120 - I chose 180 - will make the UPS f/w count down to cutting the power to the Pi - abruptly - and reconnect the power after about 9 minutes!
 As long as upsPlus.py executes every 60 seconds (cron), the reboot timer 0x1A will be reset to >=120 and the Pi will keep running, because the timer never reaches 0.
 However, if the Pi freezes, upsPlus.py will stop updating 0x1A and the reboot timer will eventually reach 0, which is when the UPS bluntly cuts the power.
 Register 0x19 needs to be 0 for this to work. Check the code and the comments in upsPlus.py.

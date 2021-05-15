@@ -15,10 +15,16 @@ from datetime import datetime, timezone
 
 # Essential UPS I2C power control register settings
 # (name format: Operation Mode, offset, purpose)
-# Default values (normal operation):
-OMR0x18D = 0    # seconds, power-off delay
+
+# Default values
+# for normal operation, incl. optional watchdog timer as suggested by GeeekPi,
+# with or without automatic restart after 9-10 minutes.
+#OMR0x18D = 0    # seconds, power-off delay 
+OMR0x18D = 180  # seconds, power-off delay (for watchdog set >=120, no auto-restart)
 OMR0x19D = 0    # boolean, automatic restart (1) or not (0) after ext. power failure
-OMR0x1AD = 180  # seconds, power-on delay (for watchdog function >=120 as suggested by Nick Tater)
+OMR0x1AD = 0    # seconds, power-on delay
+#OMR0x1AD = 180  # seconds, power-on delay (for watchdog set >=120, 10 min auto-restart)
+
 # Shutdown event values:
 OMR0x18S = 60   # seconds, power-off delay
 OMR0x19S = 1    # boolean, automatic restart (1) or not (0) after ext. power failure

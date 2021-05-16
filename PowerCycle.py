@@ -43,7 +43,7 @@ print(("*** {:^54s} ***").
 print("*"*62)
 print()
 print()
-exit()
+
 # Disable/enable automatic restart on return of external power.
 #   Enable: write 1 to register 0x19
 #   Disable: write 0 to register 0x19

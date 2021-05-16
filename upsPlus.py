@@ -76,7 +76,7 @@ putByte(0x19, OMR0x19D)
 putByte(0x1A, OMR0x1AD)
 putByte(0x18, OMR0x18D)
 # Allow I2C bus some time to settle
-time.sleep(0.1)
+#time.sleep(0.1)
 
 # Save POWEROFF_LIMIT to text file for sharing with other scripts
 f = open(PATH+'PowerOffLimit.txt', 'w')
@@ -192,7 +192,7 @@ if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
           format("If a power failure lasts for longer than ca. " +
           str(GRACE_TIME)+" min,"))
     print(("{:^60s}").
-          format("the UPS will halt the OS/Pi and then power it off."))
+          format("the UPS will halt the OS and then power the Pi off."))
     print('*'*60, "\n")
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
     print(("{:^60s}").format('Charging via micro USB connector\n'))
@@ -200,7 +200,7 @@ elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
           format("If a power failure lasts for longer than ca. " +
           str(GRACE_TIME)+" min,"))
     print(("{:^60s}").
-          format("the UPS will halt the Pi and then power it off."))
+          format("the UPS will halt the OS and then power the Pi off."))
 else:
     # Read GRACE_TIME from file, decrease by 1 and write back to file
     f = open(PATH+'GraceTime.txt', 'r')

@@ -271,10 +271,10 @@ else:
         # timer period has expired allowing the Pi to sync and then halt.
         os.system("sudo shutdown now")
         # Script continues executing, indefinitely as it were,
-        # until it is eventually killed by the Pi shutting down.
+        # until it is killed by the Pi shutting down.
         while True:
             time.sleep(10)
-    # Control is now left to the UPS' F/W and MCU ...
+    # Control now passes to the UPS' F/W and MCU ...
     # Otherwise update GRACE_TIME on file and end script execution.
     else:
         f = open(PATH+'GraceTime.txt', 'w')

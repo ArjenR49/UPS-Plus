@@ -61,9 +61,9 @@ time.sleep(2)
 os.system("sudo shutdown now")
 
 # Script continues executing, indefinitely as it were (& keeping the lock)
-# until it is eventually killed by the Pi shutting down.
+# until it is killed by the Pi shutting down.
 while True:
     time.sleep(10)
 
-# Control is now left to the UPS' F/W and MCU ...
+# Control now passes to the UPS' F/W and MCU ...
 # EOF

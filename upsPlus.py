@@ -37,7 +37,7 @@ DEVICE_ADDR = 0x17
 # Set threshold for UPS automatic power-off to prevent
 # destroying the batteries by excessive discharge (unit: mV).
 # DISCHARGE_LIMIT (a.k.a. protection voltage) will be stored in memory at 0x11-0x12
-DISCHARGE_LIMIT = 3000
+DISCHARGE_LIMIT = 2500  # for Sanyo NCR18650GA 3450 mAh Li-Ion batteries
 
 # Set threshold for UPS power-off conserving battery power &
 # providing ability to overcome possibly repeated blackouts (unit: mV).

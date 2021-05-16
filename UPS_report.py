@@ -125,7 +125,7 @@ print("Remaining battery capacity:                       %8.d %%" % (aReceiveBuf
 # and only the batteries deliver power to the Pi
 # as sampling of battery characteristics takes place.
 # The interval between sampling events is normally 2 minutes.
-print("Battery sampling interval ('blue LEDs off'):      %8.d min" % (aReceiveBuf[0x16] << 0o10 | aReceiveBuf[0x15]))
+print("Battery sampling ('blue LEDs off') interval:      %8.d min" % (aReceiveBuf[0x16] << 0o10 | aReceiveBuf[0x15]))
 
 print()
 if aReceiveBuf[0x17] == 1:

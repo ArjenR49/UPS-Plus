@@ -251,7 +251,7 @@ else:
         print('the power lost grace period expired, or the battery voltage')
         print('either dropped below the UPS\' power-off voltage limit,')
         print('or is about to drop below the deep discharge limit ...')
-        print('Shutting down the Raspberry Pi & powering off ...')
+        print('Shutting down the OS & powering the Pi off ...')
 
         # Enable automatic restart on return of external power
         # Enable: write 1 to register 0x19

@@ -55,3 +55,5 @@ You can test the watchdog by temporarily commenting out either 'putByte(0x1A, OM
 Running PowerCycle.py will also cause power-off and power-on after 10 minutes, but it will first do a shutdown of the OS before cutting the power. Make the power-off timer value large enough to allow your Pi to shutdown in an orderly manner, as the UPS has no clue about the state of the Pi or its OS.
 Thirty seconds may seem long enough, but in some circumstances a Pi might take longer. I prefer at least 60 seconds or more.
 The delay until restart used to be 5 seconds on f/w v.5, but it is now a surprising 10 minutes or so. The firmware developers at Geekpi may provide options to change this and make the button responsive during the 10 minute startup delay.
+
+During the ca. 10 minutes startup delay, my (Sanyo NCR18650GA 3450 mAh Li-Ion) batteries get charged to the full and also the last of the 4 blue LEDs stops blinking.

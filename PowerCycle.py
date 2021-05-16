@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 14-05-2021
+# ar - 16-05-2021
 
 # ''' Halt the Pi, power down, then power up Pi (= perform power cycle) '''
 
@@ -37,9 +37,9 @@ print("*"*62)
 print(("*** {:^54s} ***").
       format("Make the UPS sync & shut down Pi in an orderly manner"))
 print(("*** {:^54s} ***").format("without delay & turn power off after "
-      + str(OMR0x1A)+" seconds."))
+      + str(OMR0x1AS) +" seconds."))
 print(("*** {:^54s} ***").
-      format("Five seconds later the UPS will power up the Pi again."))
+      format("Ca. 10 min later the UPS will power up the Pi again."))
 print("*"*62)
 print()
 print()

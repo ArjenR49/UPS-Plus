@@ -20,9 +20,6 @@
 #
 # For more information see the manual pages of crontab(5) and cron(8)
 
-# Set shell
-# SHELL=/bin/bash
-
 # m h  dom mon dow   command
 
 # Run the regular UPS control script upsPlus.py every minute.

@@ -76,7 +76,7 @@ putByte(0x19, OMR0x19D)
 putByte(0x1A, OMR0x1AD)
 putByte(0x18, OMR0x18D)
 # Allow I2C bus some time to settle
-#time.sleep(0.1)
+time.sleep(1)
 
 # Save POWEROFF_LIMIT to text file for sharing with other scripts
 f = open(PATH+'PowerOffLimit.txt', 'w')

@@ -189,7 +189,7 @@ if ((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000) | \
 if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
     print(("{:^60s}").format('Charging via USB type C connector\n'))
     print(("{:^60s}").
-          format("If a power failure lasts for longer than ca. " +
+          format("If a power failure lasts longer than ca. " +
           str(GRACE_TIME)+" min,"))
     print(("{:^60s}").
           format("the UPS will halt the OS and then power the Pi off."))
@@ -197,7 +197,7 @@ if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
     print(("{:^60s}").format('Charging via micro USB connector\n'))
     print(("{:^60s}").
-          format("If a power failure lasts for longer than ca. " +
+          format("If a power failure lasts longer than ca. " +
           str(GRACE_TIME)+" min,"))
     print(("{:^60s}").
           format("the UPS will halt the OS and then power the Pi off."))

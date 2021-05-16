@@ -1,17 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Slightly edited from GeeekPi original script
+# ar - 16-05-2021
+
 import os
 import time
 import json
-import smbus2   # Required: smbus2 - pip3 install smbus2
+import smbus2
 import requests
-
 
 # How to enter into OTA mode:
 #
 # Method 1) Setting register in terminal: i2cset -y 1 0x17 50 127 b
-# (can be done in terminal by running: python3 Set_OTA_Upgrade_Mode.py)
+# (can be done in terminal by running: python3 SetUpgradeMode.py)
 #
 # Method 2) Remove all power connections and batteries, and then hold the power button, insert the batteries.
 
@@ -20,7 +22,7 @@ DEVICE_BUS = 1
 DEVICE_ADDR = 0x18 # OTA Firmware Upgrade Mode
 UPDATE_URL = "https://api.thekoziolfoundation.com/update"
 
-# instance of bus.
+# Instance of bus.
 bus = smbus2.SMBus(DEVICE_BUS)
 aReceiveBuf = []
 
@@ -38,7 +40,7 @@ if r['code'] != 0:
     print('Could not get the firmware due to:' + r['reason'])
     exit(r['code'])
 else:
-    print('Passing the authentication, downloading the latest firmware...')
+    print('Passed authentication, now downloading the latest firmware ...')
     req = requests.get(r['url'])
     with open("/tmp/firmware.bin", "wb") as f:
         f.write(req.content)
@@ -59,7 +61,8 @@ else:
                 bus.write_byte_data(0X18, 0x32, 0x00)
                 print('.', flush=True)
                 print('Firmware upgrade completed.')
-                print('Please disconnect all power/batteries and reinstall to start using the new firmware.')
+                print('Please disconnect all power/batteries and reinsert to start using the new firmware.')
                 os.system("sudo halt")
                 while True:
                     time.sleep(10)
+#EOF

@@ -9,7 +9,7 @@ import time
 from smbus2 import SMBus
 from datetime import datetime, timezone
 from math import log10, floor
-from ina219 import INA219,DeviceRangeError
+from ina219 import INA219, DeviceRangeError
 
 # Record starting time & format in two styles
 StartTime = datetime.now(timezone.utc).astimezone()
@@ -125,7 +125,7 @@ print("Remaining battery capacity:                       %8.d %%" % (aReceiveBuf
 # and only the batteries deliver power to the Pi
 # as sampling of battery characteristics takes place.
 # The interval between sampling events is normally 2 minutes.
-print("Battery sampling interval (all 4 blue LEDs off):  %8.d min" % (aReceiveBuf[0x16] << 0o10 | aReceiveBuf[0x15]))
+print("Battery sampling interval ('blue LEDs off'):      %8.d min" % (aReceiveBuf[0x16] << 0o10 | aReceiveBuf[0x15]))
 
 print()
 if aReceiveBuf[0x17] == 1:
@@ -170,7 +170,7 @@ print(("{:<60s}").format("UPS power control registers:  "
 if aReceiveBuf[0x18] == 0:
     print('0x18 - UPS power-off timer not set.')
 else:
-    print("0x18 - UPS power-off timer set to: %8.d sec" % (aReceiveBuf[0x18]))
+    print("0x18 - UPS power-off timer set to: %3.d sec" % (aReceiveBuf[0x18]))
     
 if aReceiveBuf[0x19] == 0x01:
     print(("{:<60s}").format("0x19 - Automatic restart upon return of external power"))

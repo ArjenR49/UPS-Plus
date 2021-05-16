@@ -124,7 +124,7 @@ try:
                      abs(round_sig(ina.current()/1000, n=2)), " A"))
         print(("{:<50s}{:>8.3f}{:>2s}").
               format("Power supplied to the batteries:",
-                     round_sig(ina.power()/1000, n=3), " A"))
+                     round_sig(ina.power()/1000, n=3), " W"))
     else:
         print(("{:<50s}{:>8.3f}{:>2s}").
               format("Battery current (discharging):",

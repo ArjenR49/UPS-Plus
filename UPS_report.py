@@ -133,14 +133,20 @@ else:
     print("Current power state: other")
 
 print()
+print(("{:<60s}").format("UPS power off/on timer registers 0x18 and 0x1A"))
+print(("{:<60s}").format("are set by the upsPlus.py control script"))
+print(("{:<60s}").format("to values appropriate for a power failure"))
+print(("{:<60s}").format("immediately before halting the Raspberry Pi."))
+
+print()
 if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
-    print('Charging via USB type C connector\n')
+    print('External power is connected to the USB type C connector\n')
     print(("{:<60s}").format("Should the external power be interrupted long enough"))
     print(("{:<60s}").format("to cause the battery voltage to drop below "+str(max(DISCHARGE_LIMIT,round_sig(float(POWEROFF_LIMIT)/1000,n=3)))+" V,"))
     print(("{:<60s}").format("or remain interrupted for more than "+str(GRACE_TIME)+" min,"))
     print(("{:<60s}").format("the Pi will be halted & the UPS will power it down.\n"))
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
-    print('Charging via micro USB connector\n')
+    print('External power is connected to the micro USB connector\n')
     print(("{:<60s}").format("Should the external power be interrupted long enough"))
     print(("{:<60s}").format("to cause the battery voltage to drop below "+str(max(DISCHARGE_LIMIT,round_sig(float(POWEROFF_LIMIT)/1000,n=3)))+" V,"))
     print(("{:<60s}").format("or remain interrupted for more than "+str(GRACE_TIME)+" min,"))
@@ -156,20 +162,14 @@ else:
         print("*** Grace time till shutdown is left: %d min" % GRACE_TIME)
     print()
 
-print(("{:<60s}").format("UPS power-off/on timer registers 0x18 and 0x1A"))
-print(("{:<60s}").format("are set by the upsPlus.py control script"))
-print(("{:<60s}").format("just before an imminent shut down of the Pi"))
-print(("{:<60s}").format("as initiated by a power failure."))
-print()
-
 print(("{:<60s}").format("UPS power control registers:  "
                          + "0x18=" + str(aReceiveBuf[0x18])
                          + " / 0x19=" + str(aReceiveBuf[0x19])
                          + " / 0x1A=" + str(aReceiveBuf[0x1A])))
 if aReceiveBuf[0x18] == 0:
-    print('0x18 - UPS power-off timer not set.')
+    print('0x18 - UPS power off timer not set.')
 else:
-    print("0x18 - UPS power-off timer set to: %3.d sec" % (aReceiveBuf[0x18]))
+    print("0x18 - UPS power off timer set to: %3.d sec" % (aReceiveBuf[0x18]))
     
 if aReceiveBuf[0x19] == 0x01:
     print(("{:<60s}").format("0x19 - Automatic restart upon return of external power"))
@@ -177,9 +177,9 @@ else:
     print(("{:<60s}").format("0x19 - No automatic restart upon return of external power"))
 
 if aReceiveBuf[0x1A] == 0:
-    print('0x1A - UPS power-up timer not set.')
+    print('0x1A - UPS power on timer not set.')
 else:
-    print("0x1A - UPS power-up/watchdog timer set to: %3.d sec" % (aReceiveBuf[0x1A]))
+    print("0x1A - UPS power on/watchdog timer set to: %3.d sec" % (aReceiveBuf[0x1A]))
 print()
 
 print("Accumulated running time:                         %8.d min" % round((aReceiveBuf[0x1F] << 0o30 | aReceiveBuf[0x1E] << 0o20 | aReceiveBuf[0x1D] << 0o10 | aReceiveBuf[0x1C])/60))

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 16-05-2021
+# ar - 17-05-2021
 
 # ''' Halt the Pi, power down, then power up Pi (= perform power cycle) '''
 
@@ -25,13 +25,20 @@ OMR0x1AS = 60  # seconds, power on delay (automatic restart ca. 10 min. later)
 
 # Write byte to specified I2C register address
 def putByte(RA, byte):
-    while True:
-        try:
-            with SMBus(DEVICE_BUS) as bus:
-                bus.write_byte_data(DEVICE_ADDR, RA, byte)
-                break
-        except TimeoutError:
-            time.sleep(0.1)
+    try:
+        with SMBus(DEVICE_BUS) as pbus:
+            pbus.write_byte_data(DEVICE_ADDR, RA, byte)
+    except TimeoutError as e:
+        print('error:', e)
+        time.sleep(0.1)
+# def putByte(RA, byte):
+#     while True:
+#         try:
+#             with SMBus(DEVICE_BUS) as bus:
+#                 bus.write_byte_data(DEVICE_ADDR, RA, byte)
+#                 break
+#         except TimeoutError:
+#             time.sleep(0.1)
 
 print("*"*62)
 print(("*** {:^54s} ***").

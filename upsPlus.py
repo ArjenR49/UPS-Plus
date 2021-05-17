@@ -69,8 +69,12 @@ def round_sig(x, n=3):
     return round(x * factor) / factor
 
 def putByte(RA, byte):
-    with SMBus(DEVICE_BUS) as pbus:
-        pbus.write_byte_data(DEVICE_ADDR, RA, byte)
+    try:
+        with SMBus(DEVICE_BUS) as pbus:
+            pbus.write_byte_data(DEVICE_ADDR, RA, byte)
+    except TimeoutError as e:
+        print('error:', e)
+        time.sleep(0.1)
 
 # Initialize UPS power control registers
 putByte(0x19, OMR0x19D)

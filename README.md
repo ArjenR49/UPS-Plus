@@ -94,3 +94,10 @@ The 'list index (to aReceiveBuf[i]) out of range' is obviously because byte 225 
 TimeoutError exceptions are rare, but they do happen from time to time. My tests with the scripts called CatchExceptions proved that (to me). My attempts at exception handling are those of an amateur copycat ...
 
 Testing continues ...
+
+-----------------------------------
+
+Through an oversight exception handling was missing from the putByte function in upsPlus.py, which must have been the reason that occasionally I observed (UPS_report) the countdown timer 0x18 counting down from 180 right past 120. Of course, after another execution of upsPlus.py this situation would be corrected, but it was odd. The recently observed TimeoutError in UPS_report.py already made it very clear that SMBus exception handling is essential in all cases. It should be mandatory, really.
+I added exception handling for TimeoutError to putByte() in upsPlus and the same putByte() definition is now also used in PowerCycle.py.
+
+Despite looking at the UPS_event.log a million times, upsPlus.py still had one wrong unit in its printed output (>>UPS_event.log ), viz. A for power. This was corrected.

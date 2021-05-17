@@ -109,3 +109,30 @@ Traceback (most recent call last):
     ioctl(self._device.fileno(), I2C_RDWR, request)
 TimeoutError: [Errno 110] Connection timed out
 pi@RPI-HUB:~ $
+
+pi@RPI-HUB:~ $ python3 $HOME/UPS+/UPS_report.py
+*** Data from INA219 at 0x40:
+Raspberry Pi supply voltage:                         4.920 V
+Raspberry Pi current consumption:                    2.290 A
+Raspberry Pi power consumption:                     10.700 W
+
+*** Data from INA219 at 0x45:
+Battery voltage:                                     4.130 V
+Battery current (discharging):                       2.900 A
+Battery power consumption:                          12.100 W
+
+i= 225
+Traceback (most recent call last):
+  File "/home/pi/UPS+/UPS_report.py", line 80, in <module>
+    aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
+  File "/home/pi/.local/lib/python3.7/site-packages/smbus2/smbus2.py", line 433, in read_byte_data
+    ioctl(self.fd, I2C_SMBUS, msg)
+TimeoutError: [Errno 110] Connection timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/pi/UPS+/UPS_report.py", line 84, in <module>
+    print('byte read=', aReceiveBuf[i], ' error:', e)
+IndexError: list index out of range
+pi@RPI-HUB:~ $

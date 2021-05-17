@@ -57,3 +57,38 @@ Thirty seconds may seem long enough, but in some circumstances a Pi might take l
 The delay until restart used to be 5 seconds on f/w v.5, but it is now a surprising 10 minutes or so. The firmware developers at Geekpi may provide options to change this and make the button responsive during the 10 minute startup delay.
 
 During the ca. 10 minutes startup delay, my (Sanyo NCR18650GA 3450 mAh Li-Ion) batteries get charged to the full and also the last of the 4 blue LEDs stops blinking.
+
+---------------------------------------
+There was an error in the exception handling which caused UPS_report to occasionally fail with the following:
+
+pi@RPI-HUB:~ $ python3 $HOME/UPS+/UPS_report.py
+*** Data from INA219 at 0x40:
+Raspberry Pi supply voltage:                         4.920 V
+Raspberry Pi current consumption:                    2.290 A
+Raspberry Pi power consumption:                     10.700 W
+
+*** Data from INA219 at 0x45:
+Battery voltage:                                     4.130 V
+Battery current (discharging):                       2.900 A
+Battery power consumption:                          12.100 W
+
+i= 225
+Traceback (most recent call last):
+  File "/home/pi/UPS+/UPS_report.py", line 80, in <module>
+    aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
+  File "/home/pi/.local/lib/python3.7/site-packages/smbus2/smbus2.py", line 433, in read_byte_data
+    ioctl(self.fd, I2C_SMBUS, msg)
+TimeoutError: [Errno 110] Connection timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/pi/UPS+/UPS_report.py", line 84, in <module>
+    print('byte read=', aReceiveBuf[i], ' error:', e)
+IndexError: list index out of range
+pi@RPI-HUB:~ $
+
+As the same code is used in upsPLus.py, I suspect this bug to have caused an occasional failure to restart the Pi after a scheduled PowerCycle.py, too.
+The 'list index (to aReceiveBuf[i]) out of range' is obviously because byte 225 which was the subject of the attempted read, hadn't been added to the list aReceiveBuf, i.e. the list element with i=225 hadn't been created yet. Anyway, the remedy is, don't try to print what doesn't yet exist.
+
+TimeoutError exceptions are rare, but they do happen from time to time. My tests with the scripts called CatchExceptions proved that (to me). My attempts at exception handling are those of an amateur copycat ...

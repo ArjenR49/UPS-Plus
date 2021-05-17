@@ -88,7 +88,7 @@ Traceback (most recent call last):
 IndexError: list index out of range
 pi@RPI-HUB:~ $
 
-As the same code is used in upsPLus.py, I suspect this bug to have caused an occasional failure to restart the Pi after a scheduled PowerCycle.py, too.
+As the same code is used in upsPLus.py, I suspect this bug to also have caused an occasional failure to restart the Pi after a scheduled PowerCycle.py.
 The 'list index (to aReceiveBuf[i]) out of range' is obviously because byte 225 which was the subject of the attempted read, hadn't been added to the list aReceiveBuf, i.e. the list element with i=225 hadn't been created yet. Anyway, the remedy is, don't try to print what doesn't yet exist.
 
 TimeoutError exceptions are rare, but they do happen from time to time. My tests with the scripts called CatchExceptions proved that (to me). My attempts at exception handling are those of an amateur copycat ...

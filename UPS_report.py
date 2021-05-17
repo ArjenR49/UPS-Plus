@@ -140,13 +140,13 @@ print(("{:<60s}").format("immediately before halting the Raspberry Pi."))
 
 print()
 if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
-    print('External power is connected to the USB type C connector\n')
+    print('External power is connected to the USB type C input.\n')
     print(("{:<60s}").format("Should the external power be interrupted long enough"))
     print(("{:<60s}").format("to cause the battery voltage to drop below "+str(max(DISCHARGE_LIMIT,round_sig(float(POWEROFF_LIMIT)/1000,n=3)))+" V,"))
     print(("{:<60s}").format("or remain interrupted for more than "+str(GRACE_TIME)+" min,"))
     print(("{:<60s}").format("the Pi will be halted & the UPS will power it down.\n"))
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
-    print('External power is connected to the micro USB connector\n')
+    print('External power is connected to the micro USB input.\n')
     print(("{:<60s}").format("Should the external power be interrupted long enough"))
     print(("{:<60s}").format("to cause the battery voltage to drop below "+str(max(DISCHARGE_LIMIT,round_sig(float(POWEROFF_LIMIT)/1000,n=3)))+" V,"))
     print(("{:<60s}").format("or remain interrupted for more than "+str(GRACE_TIME)+" min,"))

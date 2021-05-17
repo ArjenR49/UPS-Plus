@@ -134,8 +134,8 @@ else:
 
 print()
 print(("{:<60s}").format("UPS power off/on timer registers 0x18 and 0x1A"))
-print(("{:<60s}").format("are set by the upsPlus.py control script"))
-print(("{:<60s}").format("to values appropriate for a power failure"))
+print(("{:<60s}").format("and register 0x19 will be set to values designated"))
+print(("{:<60s}").format("for a power failure event by the upsPlus.py script"))
 print(("{:<60s}").format("immediately before halting the Raspberry Pi."))
 
 print()

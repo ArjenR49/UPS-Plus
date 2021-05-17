@@ -70,18 +70,20 @@ def round_sig(x, n=3):
 
 def putByte(RA, byte):
     try:
-        with SMBus(DEVICE_BUS) as pbus:
-            pbus.write_byte_data(DEVICE_ADDR, RA, byte)
-    except TimeoutError as e:
-        print('error:', e)
+        while True:
+            with SMBus(DEVICE_BUS) as pbus:
+                pbus.write_byte_data(DEVICE_ADDR, RA, byte)
+            break
+    except:
         time.sleep(0.1)
+#     except TimeoutError as e:
+#         print(RA, 'byte ', byte, ' - error:', e)
+#         time.sleep(0.1)
 
 # Initialize UPS power control registers
+putByte(0x18, OMR0x18D)
 putByte(0x19, OMR0x19D)
 putByte(0x1A, OMR0x1AD)
-putByte(0x18, OMR0x18D)
-# Allow I2C bus some time to settle
-time.sleep(1)
 
 # Save POWEROFF_LIMIT to text file for sharing with other scripts
 f = open(PATH+'PowerOffLimit.txt', 'w')
@@ -91,13 +93,17 @@ f.close()
 
 # Store DISCHARGE_LIMIT (a.k.a. protection voltage) in memory at 0x11-0x12
 try:
-    with SMBus(DEVICE_BUS) as bus:
-        bus.write_byte_data(DEVICE_ADDR, 0x11, DISCHARGE_LIMIT & 0xFF)
-        bus.write_byte_data(DEVICE_ADDR, 0x12,
+    while True:
+        with SMBus(DEVICE_BUS) as bus:
+            bus.write_byte_data(DEVICE_ADDR, 0x11, DISCHARGE_LIMIT & 0xFF)
+            bus.write_byte_data(DEVICE_ADDR, 0x12,
                                 (DISCHARGE_LIMIT >> 0o10) & 0xFF)
-except TimeoutError as e:
-    print(e)
+        break
+except:
     time.sleep(0.1)
+# except TimeoutError as e:
+#     print(e)
+#     time.sleep(0.1)
 
 # Create instance of INA219 and extract information
 ina = INA219(0.00725, address=0x40)
@@ -135,14 +141,17 @@ try:
               format("Battery current (discharging):",
               abs(round_sig(ina.current()/1000, n=2)), " A"))
         print(("{:<50s}{:>8.3f}{:>2s}").
-              format("Battery power consumption:",
+              format("Power supplied by the batteries:",
               round_sig(ina.power()/1000, n=3), " W"))
 except DeviceRangeError:
     print("-"*60)
     print('INA219: Out of Range Warning!')
     print('BATTERY CURRENT POSSIBLY EXCEEDING SAFE LIMITS!')
-
-print("-"*60)
+# Keep sampling in case of another type of error
+except:
+    pass
+finally:
+    print("-"*60)
 
 aReceiveBuf = []
 aReceiveBuf.append(0x00)
@@ -154,21 +163,10 @@ while i < 0x100:
             aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
             i += 1
     except TimeoutError as e:
-        print('i=', i, ' - error:', e)
+#        print('i=', i, ' - error:', e)
         time.sleep(0.1)
 
 print()
-while False:
-    if aReceiveBuf[0x19] == 0x01:
-        print(("{:^60s}").
-              format("Currently set to restart following a UPS initiated \
-              shutdown"))
-        print(("{:^60s}").format("as soon as external power returns.\n"))
-    else:
-        print(("{:^60s}").
-              format("Currently not set to restart after a UPS initiated \
-              shutdown!\n"))
-
 UID0 = "%08X" % (aReceiveBuf[0xF3] << 0o30 | aReceiveBuf[0xF2] << 0o20 |
                  aReceiveBuf[0xF1] << 0o10 | aReceiveBuf[0xF0])
 UID1 = "%08X" % (aReceiveBuf[0xF7] << 0o30 | aReceiveBuf[0xF6] << 0o20 |
@@ -182,8 +180,8 @@ print(("{:^60s}").format("UPS power control registers:  "
                          +    "0x18=" + str(aReceiveBuf[0x18])
                          + " / 0x19=" + str(aReceiveBuf[0x19])
                          + " / 0x1A=" + str(aReceiveBuf[0x1A])))
-print()
 
+print()
 # Update initial GRACE_TIME value to file whenever external power is present
 if ((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000) | \
    ((aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000):
@@ -235,16 +233,18 @@ else:
     # The script will set the UPS' power down timer initiating
     # a UPS' power down, which allows the Pi time to save buffered data
     # and halt.
-    while True:
-        try:
+    try:
+        while True:
             INA_VOLTAGE = ina.voltage()
             # Catch erroneous battery voltage value
             if INA_VOLTAGE == 0:
                 raise ValueError
             break
-        except ValueError:
-            time.sleep(0.1)
-            continue
+    except ValueError:
+        time.sleep(0.1)
+    # Keep sampling in case of another type of error
+    except:
+        pass
 
     if (
           (GRACE_TIME <= 0) or
@@ -258,19 +258,15 @@ else:
         print('or is about to drop below the deep discharge limit ...')
         print('Shutting down the OS & powering the Pi off ...')
 
-        # Enable automatic restart on return of external power
-        # Enable: write 1 to register 0x19
-        # Disable: write 0 to register 0x19
-        putByte(0x19, OMR0x19S)
-
-        # Unset UPS power up timer (unit: seconds).
-        putByte(0x1A, OMR0x1AS)
-
         # Set UPS power down timer (unit: seconds)
         # allowing the Pi time to sync & shutdown.
         putByte(0x18, OMR0x18S)
 
-        time.sleep(2)  # Allow UPS F/W to adjust to the new settings.
+        # Enable/disable automatic restart on return of external power
+        putByte(0x19, OMR0x19S)
+
+        # Set UPS power up timer (unit: seconds).
+        putByte(0x1A, OMR0x1AS)
 
         # UPS will cut power to the Pi after the UPS' power down
         # timer period has expired allowing the Pi to sync and then halt.

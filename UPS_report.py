@@ -46,7 +46,11 @@ try:
         print("Battery power consumption:                        %8.3f W" % round_sig(ina.power()/1000,n=3))
 except DeviceRangeError:
     print('Out of Range Warning: BATTERY VOLTAGE EXCEEDING SAFE LIMITS!')
-print()
+# Keep sampling in case of another type of error
+except:
+    pass
+finally:
+    print()
 
 # Path for parameter files
 PATH = str(os.getenv('HOME'))+'/UPS+/'
@@ -80,7 +84,7 @@ while i < 0x100:
             aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
             i += 1
     except TimeoutError as e:
-        print('i=', i, ' - error:', e)
+#        print('i=', i, ' - error:', e)
         time.sleep(0.1)
 
 print( "*** Remainder of report is based on data collected")

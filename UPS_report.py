@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 16-05-2021
+# ar - 17-05-2021
 
 import os
 import time
@@ -80,8 +80,7 @@ while i < 0x100:
             aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
             i += 1
     except TimeoutError as e:
-        print('i=',i)
-        print('byte read=', aReceiveBuf[i], ' error:', e)
+        print('i=', i, ' - error:', e)
         time.sleep(0.1)
 
 print( "*** Remainder of report is based on data collected")

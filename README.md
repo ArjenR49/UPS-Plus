@@ -101,3 +101,5 @@ Through an oversight exception handling was missing from the putByte function in
 I added exception handling for TimeoutError to putByte() in upsPlus and the same putByte() definition is now also used in PowerCycle.py.
 
 Despite looking at the UPS_event.log a million times, upsPlus.py still had one wrong unit in its printed output (>>UPS_event.log ), viz. A for power. This was corrected.
+
+The restart delay after a 'watchdog with restart' event or a 'power cycle' is actually less than 10 minutes, more like 8-9 minutes. 

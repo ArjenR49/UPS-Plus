@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 18-05-2021
+# ar - 19-05-2021
 
 # ''' Halt the Pi, power down, then power up Pi (= perform power cycle) '''
 
@@ -38,6 +38,7 @@ def putByte(RA, wbyte):
                 raise ValueError
         except ValueError:
             print("Write:", wbyte, "!= Read:", rbyte, " Trying again")
+            pass
         
 print("*"*62)
 print(("*** {:^54s} ***").

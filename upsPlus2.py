@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 18-05-2021
+# ar - 19-05-2021
 
 # ''' UPS Plus v.5 control script '''
 
@@ -84,6 +84,7 @@ def putByte(RA, wbyte):
                 raise ValueError
         except ValueError:
             print("Write:", wbyte, "!= Read:", rbyte, " Trying again")
+            pass
         
 # def putByte(RA, byte):
 #     try:

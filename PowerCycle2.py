@@ -72,7 +72,7 @@ putByte(0x19, OMR0x19S)
 putByte(0x1A, OMR0x1AS)
 
 # For test purposes, i.e. dry run 
-exit()
+#exit()
 
 # Halt the Pi without delay.
 os.system("sudo shutdown now")

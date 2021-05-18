@@ -86,20 +86,7 @@ def putByte(RA, wbyte):
             print("Write:", wbyte, "!= Read:", rbyte, " Trying again")
             pass
         
-# def putByte(RA, byte):
-#     try:
-#         while True:
-#             with SMBus(DEVICE_BUS) as pbus:
-#                 pbus.write_byte_data(DEVICE_ADDR, RA, byte)
-#             break
-#     except:
-#         time.sleep(0.1)
-# #     except TimeoutError as e:
-# #         print(RA, 'byte ', byte, ' - error:', e)
-# #         time.sleep(0.1)
-# 
-
-# Unset = stop timers first
+# Unset = stop power timers
 putByte(0x18, 0)
 putByte(0x1A, 0)
 
@@ -241,7 +228,7 @@ else:
     # will be initiated on one or more of the following conditions:
     # 1. Expiry of the grace period,
     # 2. The battery voltage dropped below 200 mV above discharge protection
-    # limit, or
+    #    limit, or
     # 3. The battery voltage dropped below the UPS power-off voltage limit.
     # The script will set the UPS' power down timer initiating
     # a UPS' power down, which allows the Pi time to save buffered data

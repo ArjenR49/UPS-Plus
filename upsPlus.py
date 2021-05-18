@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 18-05-2021
+# ar - 19-05-2021
 
 # ''' UPS Plus v.5 control script '''
 
@@ -18,15 +18,16 @@ from datetime import datetime, timezone
 # *** Default values ***
 # for normal operation, incl. optional watchdog timer as suggested by GeeekPi,
 # with or without automatic restart after 9-10 minutes.
-OMR0x18D = 0    # seconds, power-off delay 
-#OMR0x18D = 180  # seconds, power-off delay (for watchdog set >=120, no auto-restart)
+OMR0x18D = 0    # seconds, power-off no restart timer
+#OMR0x18D = 180  # seconds,power-off no restart timer (for watchdog set >=120)
 OMR0x19D = 0    # boolean, automatic restart (1) or not (0) after ext. power failure
-OMR0x1AD = 0    # seconds, power-on delay
-#OMR0x1AD = 180  # seconds, power-on delay (for watchdog set >=120, 10 min auto-restart)
-# *** Shutdown event values ***
-OMR0x18S = 60   # seconds, power-off delay
+#OMR0x1AD = 0    # seconds, power-off with restart timer
+OMR0x1AD = 180  # seconds, power-off with restart timer (for watchdog set >=120, 10 min auto-restart)
+
+# *** Power failure shutdown event values ***
+OMR0x18S = 60   # seconds, power-off timer without restart
 OMR0x19S = 1    # boolean, automatic restart (1) or not (0) after ext. power failure
-OMR0x1AS = 0    # seconds, power-on delay
+OMR0x1AS = 0    # seconds, power-off with restart timer
 
 # Set I2C bus
 DEVICE_BUS = 1
@@ -68,17 +69,39 @@ def round_sig(x, n=3):
     factor = (10 ** power)
     return round(x * factor) / factor
 
-def putByte(RA, byte):
-    try:
-        while True:
+# Write byte to specified I2C register address 'until it sticks'.
+def putByte(RA, wbyte):
+    while True:
+        try:
             with SMBus(DEVICE_BUS) as pbus:
-                pbus.write_byte_data(DEVICE_ADDR, RA, byte)
-            break
-    except:
-        time.sleep(0.1)
-#     except TimeoutError as e:
-#         print(RA, 'byte ', byte, ' - error:', e)
+                pbus.write_byte_data(DEVICE_ADDR, RA, wbyte)
+            with SMBus(DEVICE_BUS) as gbus:
+                rbyte = gbus.read_byte_data(DEVICE_ADDR, RA)
+            if (wbyte) <= rbyte <= (wbyte):
+                print("OK ", wbyte, rbyte)
+                break
+            else:
+                raise ValueError
+        except ValueError:
+            print("Write:", wbyte, "!= Read:", rbyte, " Trying again")
+            pass
+        
+# def putByte(RA, byte):
+#     try:
+#         while True:
+#             with SMBus(DEVICE_BUS) as pbus:
+#                 pbus.write_byte_data(DEVICE_ADDR, RA, byte)
+#             break
+#     except:
 #         time.sleep(0.1)
+# #     except TimeoutError as e:
+# #         print(RA, 'byte ', byte, ' - error:', e)
+# #         time.sleep(0.1)
+# 
+
+# Unset = stop timers first
+putByte(0x18, 0)
+putByte(0x1A, 0)
 
 # Initialize UPS power control registers
 putByte(0x18, OMR0x18D)
@@ -92,18 +115,8 @@ f.write("\n")
 f.close()
 
 # Store DISCHARGE_LIMIT (a.k.a. protection voltage) in memory at 0x11-0x12
-try:
-    while True:
-        with SMBus(DEVICE_BUS) as bus:
-            bus.write_byte_data(DEVICE_ADDR, 0x11, DISCHARGE_LIMIT & 0xFF)
-            bus.write_byte_data(DEVICE_ADDR, 0x12,
-                                (DISCHARGE_LIMIT >> 0o10) & 0xFF)
-        break
-except:
-    time.sleep(0.1)
-# except TimeoutError as e:
-#     print(e)
-#     time.sleep(0.1)
+putByte(0x11, DISCHARGE_LIMIT & 0xFF)
+putByte(0x12, (DISCHARGE_LIMIT >> 0o10) & 0xFF)
 
 # Create instance of INA219 and extract information
 ina = INA219(0.00725, address=0x40)
@@ -233,19 +246,6 @@ else:
     # The script will set the UPS' power down timer initiating
     # a UPS' power down, which allows the Pi time to save buffered data
     # and halt.
-#     try:
-#         while True:
-#             INA_VOLTAGE = ina.voltage()
-#             # Catch erroneous battery voltage value
-#             if INA_VOLTAGE == 0:
-#                 raise ValueError
-#             break
-#     except ValueError:
-#         time.sleep(0.1)
-#     # Keep sampling in case of another type of error
-#     except:
-#         pass
-# 
     while True:
         try:
             INA_VOLTAGE = ina.voltage()
@@ -253,7 +253,7 @@ else:
             if INA_VOLTAGE == 0:
                 raise ValueError
             break
-        # Keep sampling in case of any type of error
+        # Keep sampling in case of an erroneous value or exception
         except ValueError:
             time.sleep(0.1)
         except:

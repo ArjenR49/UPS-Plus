@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 17-05-2021
+# ar - 19-05-2021
 
 # ''' Halt the Pi, power down, then power up Pi (= perform power cycle) '''
 
@@ -19,20 +19,27 @@ DEVICE_ADDR = 0x17
 # Essential UPS I2C power control registers
 # (name format: Operation Mode Register Address)
 # Default values for shut down & power off state
-OMR0x18S = 0   # seconds, power off delay
-OMR0x19S = 0   # boolean, automatic restart (1) or not (0)
-OMR0x1AS = 60  # seconds, power on delay (automatic restart ca. 10 min. later)
+OMR0x18S = 0   # seconds, power off delay (no restart)
+OMR0x19S = 0   # boolean, automatic restart (1) or not (0) upon return of external power
+OMR0x1AS = 60  # seconds, power off timer (with automatic restart ca. 10 min. later)
 
-# Write byte to specified I2C register address
-def putByte(RA, byte):
-    try:
-        while True:
+# Write byte to specified I2C register address 'until it sticks'.
+def putByte(RA, wbyte):
+    while True:
+        try:
             with SMBus(DEVICE_BUS) as pbus:
-                pbus.write_byte_data(DEVICE_ADDR, RA, byte)
-            break
-    except:
-        time.sleep(0.1)
-
+                pbus.write_byte_data(DEVICE_ADDR, RA, wbyte)
+            with SMBus(DEVICE_BUS) as gbus:
+                rbyte = gbus.read_byte_data(DEVICE_ADDR, RA)
+            if (wbyte) <= rbyte <= (wbyte):
+                print("OK ", wbyte, rbyte)
+                break
+            else:
+                raise ValueError
+        except ValueError:
+            print("Write:", wbyte, "!= Read:", rbyte, " Trying again")
+            pass
+        
 print("*"*62)
 print(("*** {:^54s} ***").
       format("Have the UPS shut down the Pi in an orderly manner"))
@@ -42,6 +49,10 @@ print(("*** {:^54s} ***").
       format("Ca. 10 min later the UPS will power up the Pi again."))
 print("*"*62)
 print()
+
+# Unset = stop power timers.
+putByte(0x18, 0)
+putByte(0x1A, 0)
 
 # If only the 'power down' countdown (0x18) is set,
 # UPS will cut power to the Pi at or near the end of the countdown,
@@ -59,6 +70,9 @@ putByte(0x19, OMR0x19S)
 # allowing the Pi to sync & halt in an orderly manner.
 # The UPS will power on the Pi again after ca. 10 min.
 putByte(0x1A, OMR0x1AS)
+
+# For test purposes, i.e. dry run 
+#exit()
 
 # Halt the Pi without delay.
 os.system("sudo shutdown now")

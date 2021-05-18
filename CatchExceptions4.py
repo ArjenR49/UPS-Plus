@@ -25,14 +25,14 @@ def putByte(RA, wbyte):
                 pbus.write_byte_data(DEVICE_ADDR, RA, wbyte)
             with SMBus(DEVICE_BUS) as gbus:
                 rbyte = gbus.read_byte_data(DEVICE_ADDR, RA)
-            if (wbyte -1) <= rbyte <= (wbyte):
+            if (wbyte) <= rbyte <= (wbyte):
                 print("OK ", wbyte, rbyte)
                 break
             else:
 #            if rbyte <  max((wbyte - 2),0):
                 raise ValueError
         except ValueError:
-            print("Write or Read Error ", wbyte, rbyte, " Trying again")
+            print("Write:", wbyte, "!= Read:", rbyte, " Trying again")
         
 
 while True:

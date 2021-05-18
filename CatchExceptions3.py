@@ -42,18 +42,18 @@ while True:
         with SMBus(DEVICE_BUS) as gbus:
             byte = gbus.read_byte_data(DEVICE_ADDR, RA)
         settle()
-        if (byte in (180,179)):
+        if byte in (180,179,178,177):
             pass
             print('OK            ', i, ' - ', byte)
         else:
-            print('read != write ', i, ' - ', byte, "NOT in (180,179)")
+            print('read != write ', i, ' - ', byte, "NOT in (180,179,178,177)")
         with SMBus(DEVICE_BUS) as pbus:
             pbus.write_byte_data(DEVICE_ADDR, RA, 0)
         settle()
         with SMBus(DEVICE_BUS) as gbus:
             byte = gbus.read_byte_data(DEVICE_ADDR, RA)
         settle()
-        if (byte == 0):
+        if byte == 0:
             pass
             print('OK            ', i, ' - ', byte)
         else:

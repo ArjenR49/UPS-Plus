@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 17-05-2021
+# ar - 18-05-2021
 
 # ''' UPS Plus v.5 control script '''
 
@@ -18,8 +18,8 @@ from datetime import datetime, timezone
 # *** Default values ***
 # for normal operation, incl. optional watchdog timer as suggested by GeeekPi,
 # with or without automatic restart after 9-10 minutes.
-#OMR0x18D = 0    # seconds, power-off delay 
-OMR0x18D = 180  # seconds, power-off delay (for watchdog set >=120, no auto-restart)
+OMR0x18D = 0    # seconds, power-off delay 
+#OMR0x18D = 180  # seconds, power-off delay (for watchdog set >=120, no auto-restart)
 OMR0x19D = 0    # boolean, automatic restart (1) or not (0) after ext. power failure
 OMR0x1AD = 0    # seconds, power-on delay
 #OMR0x1AD = 180  # seconds, power-on delay (for watchdog set >=120, 10 min auto-restart)
@@ -233,19 +233,32 @@ else:
     # The script will set the UPS' power down timer initiating
     # a UPS' power down, which allows the Pi time to save buffered data
     # and halt.
-    try:
-        while True:
+#     try:
+#         while True:
+#             INA_VOLTAGE = ina.voltage()
+#             # Catch erroneous battery voltage value
+#             if INA_VOLTAGE == 0:
+#                 raise ValueError
+#             break
+#     except ValueError:
+#         time.sleep(0.1)
+#     # Keep sampling in case of another type of error
+#     except:
+#         pass
+# 
+    while True:
+        try:
             INA_VOLTAGE = ina.voltage()
             # Catch erroneous battery voltage value
             if INA_VOLTAGE == 0:
                 raise ValueError
             break
-    except ValueError:
-        time.sleep(0.1)
-    # Keep sampling in case of another type of error
-    except:
-        pass
-
+        # Keep sampling in case of any type of error
+        except ValueError:
+            time.sleep(0.1)
+        except:
+            pass
+        
     if (
           (GRACE_TIME <= 0) or
           ((INA_VOLTAGE * 1000) <= max((DISCHARGE_LIMIT + 200),

@@ -138,7 +138,7 @@ else:
 
 print()
 print(("{:<60s}").format("UPS power off/on timer registers 0x18 and 0x1A"))
-print(("{:<60s}").format("and register 0x19 will be set to values designated"))
+print(("{:<60s}").format("and register 0x19 will be set to values selected"))
 print(("{:<60s}").format("for a power failure event by the upsPlus.py script"))
 print(("{:<60s}").format("immediately before halting the Raspberry Pi."))
 
@@ -158,12 +158,10 @@ elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
 else:
 #   Not charging.
     print("*** EXTERNAL POWER LOST! RUNNING ON BATTERY POWER!")
-    print("*** As soon as the UPS control script runs, timer")
-    print("*** registers 0x18-0x1A will be set appropriately.")
     if (GRACE_TIME==0):
         print("*** A shutdown command will be sent to the OS/Pi!")
     else:
-        print("*** Grace time till shutdown is left: %d min" % GRACE_TIME)
+        print("*** Grace time till shutdown: %d min" % GRACE_TIME)
     print()
 
 print(("{:<60s}").format("UPS power control registers:  "
@@ -171,9 +169,9 @@ print(("{:<60s}").format("UPS power control registers:  "
                          + " / 0x19=" + str(aReceiveBuf[0x19])
                          + " / 0x1A=" + str(aReceiveBuf[0x1A])))
 if aReceiveBuf[0x18] == 0:
-    print('0x18 - UPS power off timer not set.')
+    print('0x18 - Power off (no restart) - timer not set.')
 else:
-    print("0x18 - UPS power off timer set to: %3.d sec" % (aReceiveBuf[0x18]))
+    print("0x18 - Power off (no restart) - timer set to: %3.d sec" % (aReceiveBuf[0x18]))
     
 if aReceiveBuf[0x19] == 0x01:
     print(("{:<60s}").format("0x19 - Automatic restart upon return of external power"))
@@ -181,9 +179,9 @@ else:
     print(("{:<60s}").format("0x19 - No automatic restart upon return of external power"))
 
 if aReceiveBuf[0x1A] == 0:
-    print('0x1A - UPS power on timer not set.')
+    print('0x1A - Power off (with restart) - timer not set.')
 else:
-    print("0x1A - UPS power on/watchdog timer set to: %3.d sec" % (aReceiveBuf[0x1A]))
+    print("0x1A - Power off (with restart) - timer set to: %3.d sec" % (aReceiveBuf[0x1A]))
 print()
 
 print("Accumulated running time:                         %8.d min" % round((aReceiveBuf[0x1F] << 0o30 | aReceiveBuf[0x1E] << 0o20 | aReceiveBuf[0x1D] << 0o10 | aReceiveBuf[0x1C])/60))

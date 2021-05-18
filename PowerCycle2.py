@@ -50,6 +50,10 @@ print(("*** {:^54s} ***").
 print("*"*62)
 print()
 
+# Unset = stop power timers.
+putByte(0x18, 0)
+putByte(0x1A, 0)
+
 # If only the 'power down' countdown (0x18) is set,
 # UPS will cut power to the Pi at or near the end of the countdown,
 # allowing the Pi to sync & halt in an orderly manner.
@@ -68,7 +72,7 @@ putByte(0x19, OMR0x19S)
 putByte(0x1A, OMR0x1AS)
 
 # For test purposes, i.e. dry run 
-#exit()
+exit()
 
 # Halt the Pi without delay.
 os.system("sudo shutdown now")

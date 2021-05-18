@@ -98,6 +98,11 @@ def putByte(RA, wbyte):
 # #         print(RA, 'byte ', byte, ' - error:', e)
 # #         time.sleep(0.1)
 # 
+
+# Unset = stop timers first
+putByte(0x18, 0)
+putByte(0x1A, 0)
+
 # Initialize UPS power control registers
 putByte(0x18, OMR0x18D)
 putByte(0x19, OMR0x19D)
@@ -241,19 +246,6 @@ else:
     # The script will set the UPS' power down timer initiating
     # a UPS' power down, which allows the Pi time to save buffered data
     # and halt.
-#     try:
-#         while True:
-#             INA_VOLTAGE = ina.voltage()
-#             # Catch erroneous battery voltage value
-#             if INA_VOLTAGE == 0:
-#                 raise ValueError
-#             break
-#     except ValueError:
-#         time.sleep(0.1)
-#     # Keep sampling in case of another type of error
-#     except:
-#         pass
-# 
     while True:
         try:
             INA_VOLTAGE = ina.voltage()
@@ -261,7 +253,7 @@ else:
             if INA_VOLTAGE == 0:
                 raise ValueError
             break
-        # Keep sampling in case of any type of error
+        # Keep sampling in case of an erroneous value or exception
         except ValueError:
             time.sleep(0.1)
         except:

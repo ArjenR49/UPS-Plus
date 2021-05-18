@@ -15,7 +15,7 @@ DEVICE_BUS = 1
 DEVICE_ADDR = 0x17
 
 def settle():
-    time.sleep(0.01)
+    time.sleep(0)
 
 # Write byte to specified I2C register address
 def putByte(RA, wbyte):
@@ -23,22 +23,22 @@ def putByte(RA, wbyte):
         try:
             with SMBus(DEVICE_BUS) as pbus:
                 pbus.write_byte_data(DEVICE_ADDR, RA, wbyte)
-            settle()
             with SMBus(DEVICE_BUS) as gbus:
                 rbyte = gbus.read_byte_data(DEVICE_ADDR, RA)
-            if rbyte >= max((wbyte - 2),0):
-                print("Close enough ", wbyte, rbyte)
+            if (wbyte -1) <= rbyte <= (wbyte):
+                print("OK ", wbyte, rbyte)
                 break
-            if rbyte <  max((wbyte - 2),0):
+            else:
+#            if rbyte <  max((wbyte - 2),0):
                 raise ValueError
         except ValueError:
-            print("Error writing ", wbyte, rbyte, " Trying again")
+            print("Write or Read Error ", wbyte, rbyte, " Trying again")
         
 
 while True:
     putByte(0x18, 180)
-    settle()
+#    settle()
     putByte(0x18,   0)
-    time.sleep(0.5)
+    time.sleep(1)
 
 # EOF

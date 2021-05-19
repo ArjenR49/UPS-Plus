@@ -103,3 +103,33 @@ I added exception handling for TimeoutError to putByte() in upsPlus and the same
 Despite looking at the UPS_event.log a million times, upsPlus.py still had one wrong unit in its printed output (>>UPS_event.log ), viz. A for power. This was corrected.
 
 The restart delay after a 'watchdog with restart' event or a 'power cycle' is actually less than 10 minutes, more like 8-9 minutes. 
+  
+---------------
+  
+After more testing using a new test script CatchExceptions.py, I found that rather often a write to a register apparently doesn't succeed and it gets to keep its previous value. This, of course, is a recipe for trouble. 
+If you run the said script on its own, keeping a terminal ready with upsPlus.py on the command line to return the register used in the test to normalcy, you can see for yourself, if your UPS exhibits write failures.
+I wrote failure, as they're not an 'exception' in the python sense. It's just that when you attempt to change the content of a register, it doesn't take.
+My prescription is to write a byte, read it back, compare the results and write again, if they're different until the write sticks, so to say.
+The bad write and failing comparison 'raise' a Value Error exception in the script. 
+I have amended both my upsPlus.py and my PowerCycle.py scripts to hammer the byte until it sticks:
+
+# Write byte to specified I2C register address 'until it sticks'.
+def putByte(RA, wbyte):
+    while True:
+        try:
+            with SMBus(DEVICE_BUS) as pbus:
+                pbus.write_byte_data(DEVICE_ADDR, RA, wbyte)
+            with SMBus(DEVICE_BUS) as gbus:
+                rbyte = gbus.read_byte_data(DEVICE_ADDR, RA)
+            if (wbyte) <= rbyte <= (wbyte):
+                print("OK ", wbyte, rbyte)
+                break
+            else:
+                raise ValueError
+        except ValueError:
+            print("Write:", wbyte, "!= Read:", rbyte, " Trying again")
+            pass
+
+It is also noteworthy that writing to a timer register (0x18, 0x1A), when its old value is not 0 seems problematic. Such a register is constantly being decremented by the f/w, which may be why changing it to anything else than 0, proved not very reliable. So I added 'reset to 0' commands to my scripts whenever the ultimate intent is to write a value other than 0 and the current content could be anything. Probably sounds complicated, but I can now have the UPS run overnight and have it do a PowerCycle twice an hour and still find the Pi running in the morning (unless it has just started the powercycle). Restart initiated by PowerCycle.py takes ca. 10 minutes which cannot be controlled by the user.
+There's no telling how this all may change whenever there's a new f/w, of course. The jump from v.5 to v.7 brought a lengthening of the restart (elicited by timer 0x1A) from 5 seconds to 10 minutes, just like that.
+

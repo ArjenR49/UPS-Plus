@@ -258,18 +258,20 @@ else:
         print('or is about to drop below the deep discharge limit ...')
         print('Shutting down the OS & powering the Pi off ...')
 
-        # Set UPS power down timer (unit: seconds)
+        # Set UPS power down without restart timer (unit: seconds)
         # allowing the Pi time to sync & shutdown.
         putByte(0x18, OMR0x18S)
 
         # Enable/disable automatic restart on return of external power
         putByte(0x19, OMR0x19S)
 
-        # Set UPS power up timer (unit: seconds).
+        # Set UPS power down with restart timer (unit: seconds)
+        # allowing the Pi time to sync & shutdown.
         putByte(0x1A, OMR0x1AS)
 
         # UPS will cut power to the Pi after the UPS' power down
-        # timer period has expired allowing the Pi to sync and then halt.
+        # timer period has expired allowing the Pi to sync and then halt
+        # in an orderly manner.
         os.system("sudo shutdown now")
         # Script continues executing, indefinitely as it were,
         # until it is killed by the Pi shutting down.

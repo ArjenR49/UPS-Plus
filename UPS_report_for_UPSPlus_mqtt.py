@@ -157,11 +157,8 @@ if aReceiveBuf[0x18] == 0:
 else:
     print("0x18 - Power off timer (no restart)   - set to: %3.d sec" % (aReceiveBuf[0x18]))
     
-if aReceiveBuf[0x19] == 0x01:
-    print(("{:<60s}").format("0x19 - Automatic restart upon return of external power"))
-else:
-    print(("{:<60s}").format("0x19 - No automatic restart upon return of external power"))
-
+print(("0x19 - Automatic restart upon return of external power: ") + ("yes" if aReceiveBuf[0x19] else "no"))
+     
 if aReceiveBuf[0x1A] == 0:
     print('0x1A - Power off timer (with restart) - not set.')
 else:
@@ -183,3 +180,4 @@ print("Serial Number: " + UID0 + "-" + UID1 + "-" + UID2 )
 print()
 
 #EOF
+

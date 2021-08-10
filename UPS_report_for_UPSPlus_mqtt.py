@@ -113,7 +113,7 @@ print(locale.format_string("Discharge limit for use by the control script:      
 
 # Fully discharged voltage is learned through charging and discharging.
 # A.k.a. empty voltage, at which the UPS f/w will cut power delivery to the Pi, if it comes to that:
-print(locale.format_string("Batteries fully discharged at (UPS/learned value):  %6.3f V   (0x0F/0x10)", round_sig((aReceiveBuf[0x10] << 0o10 | aReceiveBuf[0x0F])/1000,n=3)))
+print(locale.format_string("Batteries fully discharged at (UPS/learned value):  %6.3f V   (0x0F-0x10)", round_sig((aReceiveBuf[0x10] << 0o10 | aReceiveBuf[0x0F])/1000,n=3)))
 
 # At least one complete charge and discharge cycle needs to pass before this value is meaningful:
 print(locale.format_string("Estimated remaining battery capacity:             %8.d %%   (0x13-0x14)", (aReceiveBuf[0x14] << 0o10 | aReceiveBuf[0x13])))

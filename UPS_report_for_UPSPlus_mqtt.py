@@ -101,21 +101,22 @@ print(locale.format_string("Battery temperature (estimate):                     
 print("Automatic detection of battery type                    " + ("yes" if not aReceiveBuf[0x2A] else " no"))
 
 # Fully charged voltage is learned through charging and discharging:
-print(locale.format_string("Batteries fully charged at (learned value):         %6.3f V", round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=3)))
+print(locale.format_string("Batteries fully charged at (UPS/learned value):     %6.3f V", round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=3)))
 
 # This value is inaccurate during charging:
 print(locale.format_string("Current voltage at battery terminals:               %6.3f V", round_sig((aReceiveBuf[0x06] << 0o10 | aReceiveBuf[0x05])/1000,n=3)))
 
-# Fully discharged voltage is learned through charging and discharging (a.k.a. empty voltage):
-print(locale.format_string("Batteries fully discharged at (learned value):      %6.3f V", round_sig((aReceiveBuf[0x10] << 0o10 | aReceiveBuf[0x0F])/1000,n=3)))
-
-# The deep discharge limit value is stored in memory at 0x11-0x12 by upsPlus.py:
-# DISCHARGE_LIMIT (a.k.a. protection voltage)
+# The deep discharge limit value is stored in memory at 0x11-0x12 based on the user's own preference:
+# DISCHARGE_LIMIT (a.k.a. protection voltage):
 DISCHARGE_LIMIT=(aReceiveBuf[0x12] << 0o10 | aReceiveBuf[0x11])/1000
-print(locale.format_string("Battery discharge limit for UPS is set at:          %6.3f V", round_sig(DISCHARGE_LIMIT,n=3)))
+print(locale.format_string("Discharge limit for use by the control script:      %6.3f V", round_sig(DISCHARGE_LIMIT,n=3)))
+
+# Fully discharged voltage is learned through charging and discharging.
+# A.k.a. empty voltage, at which the UPS f/w will cut power delivery to the Pi, if it comes to that:
+print(locale.format_string("Batteries fully discharged at (UPS/learned value):  %6.3f V", round_sig((aReceiveBuf[0x10] << 0o10 | aReceiveBuf[0x0F])/1000,n=3)))
 
 # At least one complete charge and discharge cycle needs to pass before this value is meaningful:
-print(locale.format_string("Remaining battery capacity:                       %8.d %%", (aReceiveBuf[0x14] << 0o10 | aReceiveBuf[0x13])))
+print(locale.format_string("Estimated remaining battery capacity:             %8.d %%", (aReceiveBuf[0x14] << 0o10 | aReceiveBuf[0x13])))
 
 # For a few seconds all blue charging level LEDs are off
 # and only the batteries deliver power to the Pi

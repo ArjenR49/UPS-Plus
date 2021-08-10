@@ -126,9 +126,9 @@ print(locale.format_string("Battery sampling ('blue LEDs off') interval:      %8
 
 print()
 if aReceiveBuf[0x17] == 1:
-    print("Current power state: normal")
+    print("Current power state: normal (0x17)")
 else:
-    print("Current power state: other")
+    print("Current power state: other  (0x17)")
 
 print()
 if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:

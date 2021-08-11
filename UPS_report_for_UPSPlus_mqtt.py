@@ -98,7 +98,7 @@ print()
 print(locale.format_string("Battery temperature (estimate):                     %6.d°C   (0x0B-0x0C)" , round_sig(aReceiveBuf[0x0C] << 0o10 | aReceiveBuf[0x0B])))
 
 #print()
-print("Automatic detection of battery type                    " + ("yes" if not aReceiveBuf[0x2A] else " no") + "     (0x2A)")
+print("Automatic detection of battery type:                   " + ("yes" if not aReceiveBuf[0x2A] else " no") + "     (0x2A)")
 
 # Fully charged voltage is learned through charging and discharging:
 print(locale.format_string("Batteries fully charged at (UPS/learned value):     %6.3f V   (0x0D-0x0E)", round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=3)))

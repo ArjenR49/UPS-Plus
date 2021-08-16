@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 25-05-2021, 19-07-2021, 10-08-2021
+# ar - 25-05-2021, 19-07-2021, 13-08-2021, 16-08-2021
 
 import locale
 # Set to Dutch locale to get comma decimal separator
@@ -116,7 +116,7 @@ print(locale.format_string("Discharge limit for use by the control script:      
 print(locale.format_string("Batteries fully discharged at (UPS/learned value):  %6.3f V   (0x0F-0x10)", round_sig((aReceiveBuf[0x10] << 0o10 | aReceiveBuf[0x0F])/1000,n=3)))
 
 # At least one complete charge and discharge cycle needs to pass before this value is meaningful:
-print(locale.format_string("Estimated remaining battery capacity:             %8.d %%   (0x13-0x14)", (aReceiveBuf[0x14] << 0o10 | aReceiveBuf[0x13])))
+print(locale.format_string("Remaining battery capacity (estimate):            %8.d %%   (0x13-0x14)", (aReceiveBuf[0x14] << 0o10 | aReceiveBuf[0x13])))
 
 # For a few seconds all blue charging level LEDs are off
 # and only the batteries deliver power to the Pi
@@ -134,29 +134,31 @@ print()
 if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
     print('External power is connected to the USB type C input.\n')
     print("Should the external power be interrupted long enough")
-    print(locale.format_string("to cause the battery voltage to drop below %.3g V \n" +\
-                               "+ %.3g V as a safety margin, an appropriate control script", \
+    print(locale.format_string("to cause the battery voltage to drop below %.3g V \n" +
+                               "+ %.3g V as a safety margin, an appropriate control script", 
                                (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
     print("should halt the Pi, after which the UPS may eventually")
-    print("power it down depending on the value of 0x18/0x1A.\n")
+    print("power it down (& possibly restart) depending on the value")
+    print("of 0x18/0x1A.\n")
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
     print('External power is connected to the micro USB input.\n')
     print("Should the external power be interrupted long enough")
-    print(locale.format_string("to cause the battery voltage to drop below %.3g V \n" +\
-                               "+ %.3g V as a safety margin, an appropriate control script", \
+    print(locale.format_string("to cause the battery voltage to drop below %.3g V \n" +
+                               "+ %.3g V as a safety margin, an appropriate control script", 
                                (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
     print("should halt the Pi, after which the UPS may eventually")
-    print("power it down depending on the value of 0x18/0x1A.\n")
+    print("power it down (& possibly restart) depending on the value")
+    print("of 0x18/0x1A.\n")
 else:
 #   Not charging.
     print("*** EXTERNAL POWER LOST! RUNNING ON BATTERY POWER!")
     print()
     print("Should the external power be interrupted long enough")
-    print(locale.format_string("to cause the battery voltage to drop below %.3g V \n" +\
-                               "+ %.3g V as a safety margin, an appropriate control script", \
+    print(locale.format_string("to cause the battery voltage to drop below %.3g V \n" +
+                               "+ %.3g V as a safety margin, an appropriate control script", 
                                (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
     print("should halt the Pi, after which the UPS")
-    print("may eventually power it down.\n")
+    print("may eventually power it down (& possibly restart it).\n")
     print("UPS power off/on timer registers 0x18 and 0x1A")
     print("and register 0x19 should be set to values appropriate")
     print("for a power failure event by the control script")

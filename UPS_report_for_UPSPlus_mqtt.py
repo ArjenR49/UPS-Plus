@@ -39,7 +39,7 @@ ina = INA219(0.0145, busnum=DEVICE_BUS, address=0x40)
 ina.configure()
 #ina.configure(ina.RANGE_16V, ina.GAIN_2_80MV, ina.ADC_128SAMP, ina.ADC_128SAMP)
 
-print(("-------- {:^43s} ---------------------").format(TimeStampA))
+print(("------------------ {:^21s} ---------------------------------").format(TimeStampA))
 print()
 print("*** Data from INA219 at 0x40:")
 #print("Raspberry Pi supply voltage:                      %8.3f V" % round_sig(ina.voltage(),n=3))

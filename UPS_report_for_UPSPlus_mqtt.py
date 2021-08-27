@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 25-05-2021, 19-07-2021, 13-08-2021, 16-08-2021
+# ar - 25-05-2021, 19-07-2021, 13-08-2021, 16-08-2021, 20-08-2021, 23-08-2021,
+#      27-08-2021
 
 import locale
 # Set to Dutch locale to get comma decimal separator
@@ -43,7 +44,7 @@ print(("------------------ {:^21s} ---------------------------------").format(Ti
 print()
 print("*** Data from INA219 at 0x40:")
 #print("Raspberry Pi supply voltage:                      %8.3f V" % round_sig(ina.voltage(),n=3))
-print(locale.format_string("Raspberry Pi supply voltage:                      %8.3f V",round_sig(ina.voltage(),n=3)))
+print(locale.format_string("Raspberry Pi supply voltage:                      %8.3f V",round_sig(ina.voltage(),n=4)))
 print(locale.format_string("Raspberry Pi current consumption:                 %8.3f A",round_sig(ina.current()/1000,n=3)))
 print(locale.format_string("Raspberry Pi power consumption:                   %8.3f W", round_sig(ina.power()/1000,n=3)))
 print()
@@ -54,7 +55,7 @@ ina = INA219(0.011, busnum=DEVICE_BUS, address=0x45)  # Experimental value
 ina.configure()
 #ina.configure(ina.RANGE_16V, ina.GAIN_2_80MV, ina.ADC_128SAMP, ina.ADC_128SAMP)
 print("*** Data from INA219 at 0x45:")
-print(locale.format_string(        "Battery voltage:                                  %8.3f V", round_sig(ina.voltage(),n=3)))
+print(locale.format_string(        "Battery voltage:                                  %8.3f V", round_sig(ina.voltage(),n=4)))
 try:
     if ina.current() > 0:
         print(locale.format_string("Battery current (charging):                       %8.3f A", round_sig(abs(ina.current()/1000),n=3)))
@@ -87,11 +88,11 @@ print( "*** Remainder of report is based on data collected")
 print(("*** by the UPS f/w and read from memory at 0x{:02X}").format(DEVICE_ADDR))
 #print( "--- except value(s) marked with *")
 print()
-print(locale.format_string("UPS board MCU voltage:                              %6.3f V   (0x01-0x02)", round_sig((aReceiveBuf[0x02] << 0o10 | aReceiveBuf[0x01])/1000,n=3)))
-print(locale.format_string("Voltage at Pi GPIO header pins:                     %6.3f V   (0x03-0x04)", round_sig((aReceiveBuf[0x04] << 0o10 | aReceiveBuf[0x03])/1000,n=3)))
+print(locale.format_string("UPS board MCU voltage:                              %6.3f V   (0x01-0x02)", round_sig((aReceiveBuf[0x02] << 0o10 | aReceiveBuf[0x01])/1000,n=4)))
+print(locale.format_string("Voltage at Pi GPIO header pins:                     %6.3f V   (0x03-0x04)", round_sig((aReceiveBuf[0x04] << 0o10 | aReceiveBuf[0x03])/1000,n=4)))
 
-print(locale.format_string("USB type C port input voltage:                      %6.3f V   (0x07-0x08)", round_sig((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07])/1000,n=3)))
-print(locale.format_string("Micro USB port input voltage:                       %6.3f V   (0x09-0x0A)", round_sig((aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09])/1000,n=3)))
+print(locale.format_string("USB type C port input voltage:                      %6.3f V   (0x07-0x08)", round_sig((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07])/1000,n=4)))
+print(locale.format_string("Micro USB port input voltage:                       %6.3f V   (0x09-0x0A)", round_sig((aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09])/1000,n=4)))
 
 print()
 # Learned from the battery internal resistance change, the longer the use, the more stable the data:
@@ -101,10 +102,10 @@ print(locale.format_string("Battery temperature (estimate):                     
 print("Automatic detection of battery type:                   " + ("yes" if not aReceiveBuf[0x2A] else " no") + "     (0x2A)")
 
 # Fully charged voltage is learned through charging and discharging:
-print(locale.format_string("Batteries fully charged at (UPS/learned value):     %6.3f V   (0x0D-0x0E)", round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=3)))
+print(locale.format_string("Batteries fully charged at (UPS/learned value):     %6.3f V   (0x0D-0x0E)", round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=4)))
 
 # This value is inaccurate during charging:
-print(locale.format_string("Current voltage at battery terminals:               %6.3f V   (0x05-0x06)", round_sig((aReceiveBuf[0x06] << 0o10 | aReceiveBuf[0x05])/1000,n=3)))
+print(locale.format_string("Current voltage at battery terminals:               %6.3f V   (0x05-0x06)", round_sig((aReceiveBuf[0x06] << 0o10 | aReceiveBuf[0x05])/1000,n=4)))
 
 # The deep discharge limit value is stored in memory at 0x11-0x12 based on the user's own preference:
 # DISCHARGE_LIMIT (a.k.a. protection voltage):
@@ -133,36 +134,32 @@ else:
 print()
 if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
     print('External power is connected to the USB type C input.\n')
-    print("Should the external power be interrupted long enough")
-    print(locale.format_string("to cause the battery voltage to drop below %.3g V \n" +
-                               "+ %.3g V as a safety margin, an appropriate control script", 
+    print("Should the external power be interrupted long enough to cause the battery")
+    print(locale.format_string("voltage to drop below %.3g V (+ %.3g V as a safety margin), an appropriate", 
                                (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
-    print("should halt the Pi, after which the UPS may eventually")
-    print("power it down (& possibly restart) depending on the value")
-    print("of 0x18/0x1A.\n")
+    print("control script should halt the Pi, after which the UPS may eventually")
+    print("power the Pi down (& possibly restart upon return of external power)")
+    print("depending on the value of 0x18/0x1A.\n")
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
     print('External power is connected to the micro USB input.\n')
-    print("Should the external power be interrupted long enough")
-    print(locale.format_string("to cause the battery voltage to drop below %.3g V \n" +
-                               "+ %.3g V as a safety margin, an appropriate control script", 
+    print("Should the external power be interrupted long enough to cause the battery")
+    print(locale.format_string("voltage to drop below %.3g V (+ %.3g V as a safety margin), an appropriate", 
                                (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
-    print("should halt the Pi, after which the UPS may eventually")
-    print("power it down (& possibly restart) depending on the value")
-    print("of 0x18/0x1A.\n")
+    print("control script should halt the Pi, after which the UPS may eventually")
+    print("power the Pi down (& possibly restart upon return of external power)")
+    print("depending on the value of 0x18/0x1A.\n")
 else:
 #   Not charging.
     print("*** EXTERNAL POWER LOST! RUNNING ON BATTERY POWER!")
     print()
-    print("Should the external power be interrupted long enough")
-    print(locale.format_string("to cause the battery voltage to drop below %.3g V \n" +
-                               "+ %.3g V as a safety margin, an appropriate control script", 
+    print("Should the external power be interrupted long enough to cause the battery")
+    print(locale.format_string("voltage to drop below %.3g V (+ %.3g V as a safety margin), an appropriate", 
                                (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
-    print("should halt the Pi, after which the UPS")
-    print("may eventually power it down (& possibly restart it).\n")
-    print("UPS power off/on timer registers 0x18 and 0x1A")
-    print("and register 0x19 should be set to values appropriate")
-    print("for a power failure event by the control script")
-    print("immediately before halting the Raspberry Pi.")
+    print("control script should halt the Pi, after which the UPS may eventually")
+    print("power the Pi down & possibly restart it upon return of external power.\n")
+    print("UPS power off/on timer registers 0x18 and 0x1A and register 0x19")
+    print("should be set to values appropriate for a power failure event")
+    print("by the control script immediately before halting the Raspberry Pi.")
     print()
 
 

@@ -138,16 +138,16 @@ if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
     print(locale.format_string("voltage to drop below %.3g V (+ %.3g V as a safety margin), an appropriate", 
                                (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
     print("control script should halt the Pi, after which the UPS may eventually")
-    print("power the Pi down (& possibly restart upon return of external power)")
-    print("depending on the value of 0x18/0x1A.\n")
+    print("power the Pi down (& possibly restart it upon return of external power)")
+    print("depending on the content of 0x18 & 0x1A.\n")
 elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
     print('External power is connected to the micro USB input.\n')
     print("Should the external power be interrupted long enough to cause the battery")
     print(locale.format_string("voltage to drop below %.3g V (+ %.3g V as a safety margin), an appropriate", 
                                (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
     print("control script should halt the Pi, after which the UPS may eventually")
-    print("power the Pi down (& possibly restart upon return of external power)")
-    print("depending on the value of 0x18/0x1A.\n")
+    print("power the Pi down (& possibly restart it upon return of external power)")
+    print("depending on the content of 0x18 & 0x1A.\n")
 else:
 #   Not charging.
     print("*** EXTERNAL POWER LOST! RUNNING ON BATTERY POWER!")

@@ -106,7 +106,7 @@ putByte(0x11, DISCHARGE_LIMIT & 0xFF)
 putByte(0x12, (DISCHARGE_LIMIT >> 0o10) & 0xFF)
 
 # Create instance of INA219 and extract information
-ina = INA219(0.00725, address=0x40)
+ina = INA219(0.00725, busnum=DEVICE_BUS, address=0x40)
 ina.configure()
 print("="*60)
 print(("------ {:^46s} ------").format(TimeStampA))
@@ -122,7 +122,7 @@ print(("{:<50s}{:>8.3f}{:>2s}").format("Raspberry Pi power consumption:",
 print("-"*60)
 
 # Battery information
-ina = INA219(0.005, address=0x45)
+ina = INA219(0.005, busnum=DEVICE_BUS, address=0x45)
 ina.configure()
 print(("------ {:^46s} ------").format("UPS Plus batteries"))
 print("-"*60)

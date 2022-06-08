@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# modified from script by @frtz13: ar - 08-06-2021
+# modified from script by @frtz13: ar - 08-06-2021, 04-08-2021, 19-08-2021, 06-06-2022
+
+# If the protection voltage is set too low, the UPS will not start the Pi after the batteries have been run down.
+# Also the UPS will make a futile attempt to start the Pi after it has been made to shut down by the control script.
 
 import sys
 import smbus2
@@ -17,7 +20,7 @@ print("-"*60)
 print("Modify battery protection voltage for UPS Plus")
 print("-"*60)
 
-PV_Mini_mV = 2500
+PV_Mini_mV = 3000
 PV_Maxi_mV = 4000
 
 # Raspberry Pi communicates with MCU via i2c protocol.

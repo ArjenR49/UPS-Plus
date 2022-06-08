@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 08-05-2021, 30-05-2022, 03-06-2022, 07-06-2022
+# ar - 08-05-2021, 30-05-2022, 03-06-2022, 09-06-2022
 
 # ''' Halt the Pi, cut power, then restore power a few minutes later, so Pi starts up again (= perform power cycle) '''
 
 import os
+import sys
 import time
 import smbus2
 import click
@@ -31,17 +32,24 @@ print("*"*62)
 print(("*** {:^54s} ***").format("-- Perform a controlled power cycle --"))
 print(("*** {:^54s} ***").format("Script shuts down OS in an orderly manner and makes"))
 print(("*** {:^54s} ***").format("the UPS+ cut power to the Pi after "+str(OMR0x1A)+" seconds."))
-print(("*** {:^54s} ***").format("About 10 minutes later the UPS+ restores power,"))
+print(("*** {:^54s} ***").format("About 8 minutes later the UPS+ restores power,"))
 print(("*** {:^54s} ***").format("and the Pi will start up again."))
 print("*"*62)
 print()
 
-if click.confirm('Do you want to continue?', default=True):
-    click.echo('Initiating power cycle ...')
-else:
-    print('Script aborted')
+if len(sys.argv) == 1:
+    if click.confirm('Do you want to continue?', default=True):
+        click.echo('Initiating power cycle ...')
+    else:
+        print('Script aborted')
+        exit()
+elif (len(sys.argv) > 1) and not (sys.argv[1]=="yes"):
+    print("Incorrect parameter")
+    print("Syntax for non-interactive use is: PowerCycle.py yes")
     exit()
     
+print('Initiating power cycle ...')
+
 #exit()
 
 # Set UPS power down timer (unit: seconds) to allow the Pi ample time to sync & shutdown.
@@ -70,7 +78,7 @@ while True:
 # For power cycling only the 'restart countdown' register (0x1A) must be set!
 # The UPS+ will disconnect power from the Pi at the end of the countdown,
 # thus allowing the script to make the OS shut down before the power is cut.
-# About 10 minutes later the UPS+ restores power to the Pi, which will then restart.
+# About 8 minutes later the UPS+ restores power to the Pi, which will then restart.
 while True:
     try:
         bus.write_byte_data(DEVICE_ADDR, 0x1A, OMR0x1A)

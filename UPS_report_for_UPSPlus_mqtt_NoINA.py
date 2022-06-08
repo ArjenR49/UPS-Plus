@@ -1,0 +1,160 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
+# ar - 25-05-2021, 19-07-2021, 13-08-2021, 16-08-2021, 20-08-2021, 23-08-2021,
+#      27-08-2021, 05-04-2022, 09-05-2022, 23-05-2022, 06-06-2022
+
+import locale
+# Set to Dutch locale to get comma decimal separator
+#locale.setlocale(locale.LC_NUMERIC, 'nl_NL.UTF-8')
+# Set to system default locale (enable number formatting using decimal separator for the locale)
+locale.setlocale(locale.LC_ALL, '')
+
+from smbus2 import SMBus
+from datetime import datetime, timezone
+from math import log10, floor
+#from ina219 import INA219, DeviceRangeError
+
+PROTECTION_VOLTAGE_MARGIN_mV=float(200)  # mV
+PROTECTION_VOLTAGE_MARGIN_mV=PROTECTION_VOLTAGE_MARGIN_mV/1000  # convert to V
+
+# Record starting time & format in two styles
+StartTime = datetime.now(timezone.utc).astimezone()
+TimeStampA = '{:%d-%m-%Y %H:%M:%S}'.format(StartTime)
+TimeStampB = '{:%Y-%m-%d_%H:%M:%S}'.format(StartTime)
+
+def round_sig(x, n=3):
+    if not x: return 0
+    power = -floor(log10(abs(x))) + (n - 1)
+    factor = (10 ** power)
+    return round(x * factor) / factor
+
+DEVICE_BUS = 1
+DEVICE_ADDR = 0x17
+
+print(("------------------ {:^21s} ---------------------------------").format(TimeStampA))
+print()
+
+aReceiveBuf = []
+aReceiveBuf.append(0x00)
+
+i = 0x01
+while i < 0x100:
+    try:
+        with SMBus(DEVICE_BUS) as bus:
+            aReceiveBuf.append(bus.read_byte_data(DEVICE_ADDR, i))
+            i += 1
+    except Exception as e:
+        raise Exception("[UPS_report] Error reading UPS registers: " + str(e))
+
+print( "*** Report is based on data collected")
+print(("*** by the UPS f/w and read from memory at 0x{:02X}").format(DEVICE_ADDR))
+#print( "--- except value(s) marked with *")
+print()
+print(locale.format_string("UPS board MCU voltage:                              %6.3f V   (0x01-0x02)", round_sig((aReceiveBuf[0x02] << 0o10 | aReceiveBuf[0x01])/1000,n=4)))
+print(locale.format_string("Voltage supplied to the Pi at the POGO pins:        %6.3f V   (0x03-0x04)", round_sig((aReceiveBuf[0x04] << 0o10 | aReceiveBuf[0x03])/1000,n=4)))
+
+print(locale.format_string("USB type C port input voltage:                      %6.3f V   (0x07-0x08)", round_sig((aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07])/1000,n=4)))
+print(locale.format_string("Micro USB port input voltage:                       %6.3f V   (0x09-0x0A)", round_sig((aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09])/1000,n=4)))
+
+print()
+# Learned from the battery internal resistance change, the longer the use, the more stable the data:
+print(locale.format_string("Battery temperature (estimate):                     %6.d°C   (0x0B-0x0C)" , round_sig(aReceiveBuf[0x0C] << 0o10 | aReceiveBuf[0x0B])))
+
+#print()
+print("Automatic detection of battery type:                   " + ("yes" if not aReceiveBuf[0x2A] else " no") + "     (0x2A)")
+
+# Fully charged voltage is learned through charging and discharging:
+print(locale.format_string("Batteries fully charged at (UPS/learned value):     %6.3f V   (0x0D-0x0E)", round_sig((aReceiveBuf[0x0E] << 0o10 | aReceiveBuf[0x0D])/1000,n=4)))
+
+# This value is inaccurate during charging:
+print(locale.format_string("Voltage at battery terminals:                       %6.3f V   (0x05-0x06)", round_sig((aReceiveBuf[0x06] << 0o10 | aReceiveBuf[0x05])/1000,n=4)))
+
+# The deep discharge limit value is stored in memory at 0x11-0x12 based on the user's own preference:
+# DISCHARGE_LIMIT (a.k.a. protection voltage):
+DISCHARGE_LIMIT=(aReceiveBuf[0x12] << 0o10 | aReceiveBuf[0x11])/1000
+print(locale.format_string("Discharge limit to be used by the control script:   %6.3f V   (0x11-0x12)", round_sig(DISCHARGE_LIMIT,n=3)))
+
+# Fully discharged voltage is learned through charging and discharging.
+# A.k.a. empty voltage, at which the UPS f/w will cut power delivery to the Pi, if it comes to that:
+print(locale.format_string("Batteries fully discharged at (UPS/learned value):  %6.3f V   (0x0F-0x10)", round_sig((aReceiveBuf[0x10] << 0o10 | aReceiveBuf[0x0F])/1000,n=3)))
+
+# At least one complete charge and discharge cycle needs to pass before this value is meaningful:
+print(locale.format_string("Remaining battery capacity (estimate):            %8.d %%   (0x13-0x14)", (aReceiveBuf[0x14] << 0o10 | aReceiveBuf[0x13])))
+
+# For a few seconds all blue charging level LEDs are off
+# and only the batteries deliver power to the Pi
+# as sampling of battery characteristics takes place.
+# The interval between sampling events is normally 2 minutes.
+print(locale.format_string("Battery sampling ('blue LEDs off') interval:      %8.d min (0x15-0x16)", (aReceiveBuf[0x16] << 0o10 | aReceiveBuf[0x15])))
+
+print()
+print("Current power state:                                " + ("normal" if aReceiveBuf[0x17] else " other") + "     (0x17)")
+    
+print()
+if (aReceiveBuf[0x08] << 0o10 | aReceiveBuf[0x07]) > 4000:
+    print('External power is connected to the USB type C input.\n')
+    print("Should the external power be interrupted long enough to cause the battery")
+    print(locale.format_string("voltage to drop below %.3g V (+ %.3g V as a safety margin), an appropriate", 
+                               (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
+    print("control script should halt the Pi, after which the UPS may eventually")
+    print("power the Pi down (& possibly restart it upon return of external power)")
+    print("depending on the content of 0x18 & 0x1A.\n")
+elif (aReceiveBuf[0x0A] << 0o10 | aReceiveBuf[0x09]) > 4000:
+    print('External power is connected to the micro USB input.\n')
+    print("Should the external power be interrupted long enough to cause the battery")
+    print(locale.format_string("voltage to drop below %.3g V (+ %.3g V as a safety margin), an appropriate", 
+                               (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
+    print("control script should halt the Pi, after which the UPS may eventually")
+    print("power the Pi down (& possibly restart it upon return of external power)")
+    print("depending on the content of 0x18 & 0x1A.\n")
+else:
+#   Not charging.
+    print("*** EXTERNAL POWER LOST! RUNNING ON BATTERY POWER!")
+    print()
+    print("Should the external power be interrupted long enough to cause the battery")
+    print(locale.format_string("voltage to drop below %.3g V (+ %.3g V as a safety margin), an appropriate", 
+                               (DISCHARGE_LIMIT, PROTECTION_VOLTAGE_MARGIN_mV)))
+    print("control script should halt the Pi, after which the UPS may eventually")
+    print("power the Pi down & possibly restart it upon return of external power.\n")
+    print("UPS power off/on timer registers 0x18 and 0x1A and register 0x19")
+    print("should be set to values appropriate for a power failure event")
+    print("by the control script immediately before halting the Raspberry Pi.")
+    print()
+
+
+print(("{:<60s}").format("Current values of the UPS power control registers:\n"
+                         +    "0x18=" + str(aReceiveBuf[0x18])
+                         + " / 0x19=" + str(aReceiveBuf[0x19])
+                         + " / 0x1A=" + str(aReceiveBuf[0x1A])
+                         + "\nExplanation:"))
+if aReceiveBuf[0x18] == 0:
+    print('0x18 - Power off timer (no restart)   - not set.')
+else:
+    print("0x18 - Power off timer (no restart)   - set to: %3.d sec" % (aReceiveBuf[0x18]))
+    
+print(("0x19 - Automatic restart upon return of external power: ") + ("yes" if aReceiveBuf[0x19] else "no"))
+     
+if aReceiveBuf[0x1A] == 0:
+    print('0x1A - Power off timer (with restart) - not set.')
+else:
+    print("0x1A - Power off timer (with restart) - set to: %3.d sec" % (aReceiveBuf[0x1A]))
+print()
+
+print("Accumulated running time:                         %8.d min (0x1C-0x1F)" % round((aReceiveBuf[0x1F] << 0o30 | aReceiveBuf[0x1E] << 0o20 | aReceiveBuf[0x1D] << 0o10 | aReceiveBuf[0x1C])/60))
+print("Accumulated charging time:                        %8.d min (0x20-0x23)" % round((aReceiveBuf[0x23] << 0o30 | aReceiveBuf[0x22] << 0o20 | aReceiveBuf[0x21] << 0o10 | aReceiveBuf[0x20])/60))
+print("Current up time:                                  %8.d min (0x24-0x27)" % round((aReceiveBuf[0x27] << 0o30 | aReceiveBuf[0x26] << 0o20 | aReceiveBuf[0x25] << 0o10 | aReceiveBuf[0x24])/60))
+
+print(("{:<s}{:>2d}").format("F/W version: ",(aReceiveBuf[0x29] << 0o10 | aReceiveBuf[0x28])))
+
+# Serial Number
+UID0 = "%08X" % (aReceiveBuf[0xF3] << 0o30 | aReceiveBuf[0xF2] << 0o20 | aReceiveBuf[0xF1] << 0o10 | aReceiveBuf[0xF0])
+UID1 = "%08X" % (aReceiveBuf[0xF7] << 0o30 | aReceiveBuf[0xF6] << 0o20 | aReceiveBuf[0xF5] << 0o10 | aReceiveBuf[0xF4])
+UID2 = "%08X" % (aReceiveBuf[0xFB] << 0o30 | aReceiveBuf[0xFA] << 0o20 | aReceiveBuf[0xF9] << 0o10 | aReceiveBuf[0xF8])
+
+print("Serial Number: " + UID0 + "-" + UID1 + "-" + UID2 )
+print()
+
+#EOF
+

@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 08-05-2021, 30-05-2022, 03-06-2022, 07-06-2022
+# ar - 08-05-2021, (PowerDown.py) 30-05-2022, 03-06-2022, 07-06-2022
 
-# ''' Halt the Pi, cut power, then restore power a few minutes later, so Pi starts up again (= perform power cycle) '''
+# ''' Halt the Pi, then cut power '''
 
 import os
 import time
@@ -20,24 +20,22 @@ DEVICE_ADDR = 0x17
 # UPS I2C registers used in this script (name format: Operation Mode Register Address)
 # Set only one of 0x18 or 0x19 unequal to 0, not both!
 # The values given here determine how the UPS+ will proceed after this script ends.
-OMR0x18=0   # seconds, power off delay, power stays off
+OMR0x18=60  # seconds, power off delay, power stays off
 OMR0x19=0   # boolean, automatic restart or not upon return of external power
-OMR0x1A=60  # seconds, power off delay with subsequent restoring power about 10 minutes later.
+OMR0x1A=0   # seconds, power off delay with subsequent restoring power about 10 minutes later.
 
-# Raspberry Pi Communicates with MCU via I2C protocol.
+# Raspberry Pi communicates with MCU via I2C protocol.
 bus = smbus2.SMBus(DEVICE_BUS)
 
 print("*"*62)
-print(("*** {:^54s} ***").format("-- Perform a controlled power cycle --"))
+print(("*** {:^54s} ***").format("-- Perform a controlled shutdown --"))
 print(("*** {:^54s} ***").format("Script shuts down OS in an orderly manner and makes"))
-print(("*** {:^54s} ***").format("the UPS+ cut power to the Pi after "+str(OMR0x1A)+" seconds."))
-print(("*** {:^54s} ***").format("About 10 minutes later the UPS+ restores power,"))
-print(("*** {:^54s} ***").format("and the Pi will start up again."))
+print(("*** {:^54s} ***").format("the UPS+ cut power to the Pi after "+str(OMR0x18)+" seconds."))
 print("*"*62)
 print()
 
 if click.confirm('Do you want to continue?', default=True):
-    click.echo('Initiating power cycle ...')
+    click.echo('Shut down OS & remove power ...')
 else:
     print('Script aborted')
     exit()
@@ -57,8 +55,8 @@ while True:
 
 # Automatic restart on return of external power?
 # Used in the UPS+ control script.
-#    Enable:  write 1 to register 0x19
-#    Disable: write 0 to register 0x19
+#     Enable:  write 1 to register 0x19
+#     Disable: write 0 to register 0x19
 while True:
     try:
         bus.write_byte_data(DEVICE_ADDR, 0x19, OMR0x19)
@@ -82,7 +80,7 @@ while True:
 # Make Pi perform sync and then halt.
 os.system("sudo sync && sudo halt &")
 
-# Script continues executing, indefinitely as it were (& keeping the lock)
+# Script continues executing, indefinitely as it were.
 # until it is eventually killed by the Pi shutting down.
 while True:
     time.sleep(10)

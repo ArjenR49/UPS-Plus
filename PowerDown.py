@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 08-05-2021, (PowerDown.py) 30-05-2022, 03-06-2022, 07-06-2022
+# ar - 08-05-2021, (PowerDown.py) 30-05-2022, 03-06-2022, 07-06-2022, 11-06-2022
 
 # ''' Halt the Pi, then cut power '''
 
@@ -21,7 +21,7 @@ DEVICE_ADDR = 0x17
 # Set only one of 0x18 or 0x19 unequal to 0, not both!
 # The values given here determine how the UPS+ will proceed after this script ends.
 OMR0x18=60  # seconds, power off delay, power stays off
-OMR0x19=0   # boolean, automatic restart or not upon return of external power
+OMR0x19=1   # boolean, automatic restart or not upon return of external power
 OMR0x1A=0   # seconds, power off delay with subsequent restoring power about 10 minutes later.
 
 # Raspberry Pi communicates with MCU via I2C protocol.

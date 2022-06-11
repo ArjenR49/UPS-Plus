@@ -3,7 +3,7 @@
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
 # Execute UPS function "0x1B Reset to Factory Defaults 0/1 Bool"
-# ar - 08-06-2022
+# ar - 08-06-2022, 11-06-2022
 
 import sys
 import smbus2
@@ -20,10 +20,10 @@ DEVICE_ADDR = 0x17
 bus = smbus2.SMBus(DEVICE_BUS)
 
 print("*"*62)
-print(("*** {:^54s} ***").format("-- Perform reset to factory defaults --"))
-print(("*** {:^54s} ***").format("By writing 1 to register 0x1B the script"))
-print(("*** {:^54s} ***").format("makes the f/w reset various settings."))
-print(("*** {:^54s} ***").format("Ultimately the register will be set back to 0."))
+print(("*** {:^54s} ***").format("-- Perform a reset to factory defaults --"))
+print(("*** {:^54s} ***").format("Writing 1 to register 0x1B makes the UPS"))
+print(("*** {:^54s} ***").format("reset various settings to default values."))
+print(("*** {:^54s} ***").format(">>> 0x1B will automatically be set back to 0 <<<"))
 print("*"*62)
 print()
 

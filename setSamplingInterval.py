@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# modified from script by @frtz13: ar - 08-06-2021
+# modified from script by @frtz13: ar - 08-06-2021, 11-06-2022
 
 import sys
 import smbus2
@@ -31,7 +31,7 @@ if len(sys.argv) > 1:
         if givenSI >= SI_Min and givenSI <= SI_Max :
             bus.write_byte_data(DEVICE_ADDR, 0x15, givenSI & 0xFF)
             bus.write_byte_data(DEVICE_ADDR, 0x16, (givenSI >> 0o10) & 0xFF)
-            print("Successfully set the battery sampling interval to: %d min" % givenSI)
+            print("Successfully changed the battery sampling interval to: %d min" % givenSI)
         else:
             errMsg = "Valid sampling interval values range from {:.0f} to {:.0f} min".format(SI_Min, SI_Max)
             print(errMsg)

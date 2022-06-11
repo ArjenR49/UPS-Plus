@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# modified from script by @frtz13: ar - 08-06-2021, 04-08-2021, 19-08-2021, 06-06-2022
+# modified from script by @frtz13: ar - 08-06-2021, 04-08-2021, 19-08-2021, 06-06-2022, 11-06-2022
 
 # If the protection voltage is set too low, the UPS will not start the Pi after the batteries have been run down.
 # Also the UPS will make a futile attempt to start the Pi after it has been made to shut down by the control script.
@@ -34,7 +34,7 @@ if len(sys.argv) > 1:
         if givenPV_mV >= PV_Mini_mV and givenPV_mV <= PV_Maxi_mV :
             bus.write_byte_data(DEVICE_ADDR, 0x11, givenPV_mV & 0xFF)
             bus.write_byte_data(DEVICE_ADDR, 0x12, (givenPV_mV >> 0o10) & 0xFF)
-            print("Successfully set the protection voltage to: %d mV" % givenPV_mV)
+            print("Successfully changed the protection voltage to: %d mV" % givenPV_mV)
         else:
             errMsg = "Valid protection voltage values range from {:.0f} to {:.0f} mV".format(PV_Mini_mV, PV_Maxi_mV)
             print(errMsg)

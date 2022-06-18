@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # adapted from scripts provided at GitHub: Geeekpi/upsplus by nickfox-taterli
-# ar - 08-05-2021, 30-05-2022, 03-06-2022, 09-06-2022
+# ar - 08-05-2021, 30-05-2022, 03-06-2022, 09-06-2022, 16-06-2022, 17-06-2022
 
 # ''' Halt the Pi, cut power, then restore power a few minutes later, so Pi starts up again (= perform power cycle) '''
 
@@ -32,13 +32,14 @@ print("*"*62)
 print(("*** {:^54s} ***").format("-- Perform a controlled power cycle --"))
 print(("*** {:^54s} ***").format("Script shuts down OS in an orderly manner and makes"))
 print(("*** {:^54s} ***").format("the UPS+ cut power to the Pi after "+str(OMR0x1A)+" seconds."))
+print("*"*62)
 print(("*** {:^54s} ***").format("About 8 minutes later the UPS+ restores power,"))
 print(("*** {:^54s} ***").format("and the Pi will start up again."))
 print("*"*62)
 print()
 
 if len(sys.argv) == 1:
-    if click.confirm('Do you want to continue?', default=True):
+    if click.confirm('Do you want to continue?', default=False):
         click.echo('Initiating power cycle ...')
     else:
         print('Script aborted')
@@ -64,7 +65,6 @@ while True:
 
 
 # Automatic restart on return of external power?
-# Used in the UPS+ control script.
 #    Enable:  write 1 to register 0x19
 #    Disable: write 0 to register 0x19
 while True:
